@@ -23,7 +23,6 @@ hs_err_pid*
 
 
 /ProjetReseau/nbproject/private/
-TestReseau/build/classes/.netbeans_automatic_build
-TestReseau/build/classes/.netbeans_update_resources
-*.txt
+
 /TestReseau/build/
+/TestReseau/nbproject/private/
