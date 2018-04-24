@@ -1,5 +1,5 @@
 package reso.testing;
-
+/*
 import org.junit.Test;
 
 import reso.ip.IPAddress;
@@ -60,3 +60,4 @@ public class TestIPAddress extends TestCase {
 	}
 	
 }
+*/

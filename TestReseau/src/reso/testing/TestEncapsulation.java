@@ -1,5 +1,5 @@
 package reso.testing;
-
+/*
 import org.junit.Test;
 
 import reso.common.AbstractMessage;
@@ -59,3 +59,4 @@ public class TestEncapsulation {
 	}
 	
 }
+*/
