@@ -32,8 +32,10 @@ public class PingPongProtocol implements IPInterfaceListener {
 		System.out.println("Ping-Pong (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)" +
 				" host=" + host.name + ", dgram.src=" + datagram.src + ", dgram.dst=" +
 				datagram.dst + ", iif=" + src + ", counter=" + msg.num);
-    	if (msg.num > 0)
+    	if (msg.num > 0){
+                System.out.println("- J'envois. src= "+IPAddress.ANY+"      dest= "+datagram.src);
     		host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_PINGPONG, new PingPongMessage(msg.num-1));
+        }
+        
 	}
-
 }
