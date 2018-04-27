@@ -38,15 +38,19 @@ public class BackNMain {
                 if (ENABLE_SNIFFER)
     			host1.addApplication(new AppSniffer(host1, new String [] {"eth0"}));
                 */
-                AbstractApplication sender = new AppSender(host1, IP_ADDR2, false);
-    		sender.addToSendingQueue("1");
+                AbstractApplication sender = new GbnSender(host1, IP_ADDR2, false);
+                ((GbnSender)sender).dudename="sen1";
+    		//sender.addToSendingQueue("1");
                 host1.addApplication(sender);
-                sender.addToSendingQueue("2");
+                //sender.addToSendingQueue("2");
                 //while() ENVOYERP PLEIN DE PACKAGE C'EST LA FETE
                 
     		IPHost host2= NetworkBuilder.createHost(network,"H2", IP_ADDR2, MAC_ADDR2);
     		host2.getIPLayer().addRoute(IP_ADDR1, "eth0");
-    		host2.addApplication(new AppReceiver(host2));
+                
+                AbstractApplication receiver = new GbnReceiver(host2);
+                ((GbnReceiver)receiver).dudename="res1";
+    		host2.addApplication(receiver);
 
     		EthernetInterface h1_eth0= (EthernetInterface) host1.getInterfaceByName("eth0");
     		EthernetInterface h2_eth0= (EthernetInterface) host2.getInterfaceByName("eth0");

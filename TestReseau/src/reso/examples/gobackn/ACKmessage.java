@@ -12,14 +12,14 @@ import reso.common.Message;
  * @author Alfatta
  */
 public class ACKmessage implements Message{
-    	public final int num; 
+    	public final int seqNum; 
 	
 	public ACKmessage(int num) {
-		this.num= num;
+		this.seqNum= num;
 	}
 	
 	public String toString() {
-		return "ACK [num="+num+"]";
+		return "ACK [num="+seqNum+"]";
 	}
 
 	@Override
@@ -27,4 +27,9 @@ public class ACKmessage implements Message{
 		// The ping-pong message carries a single 'int'
 		return Integer.SIZE / 8;
 	}
+
+    public int getSeqNum() {
+        return seqNum;
+    }
+        
 }

@@ -11,18 +11,27 @@ import reso.common.Message;
  *
  * @author Alfatta
  */
-public class gbnMessage implements Message{
+public class GbnMessage implements Message{
 
     
     String data;
-    int num;
+    public final int seqNum;
     
-    public gbnMessage(String data, int num) {
+    public GbnMessage(String data, int num) {
 		this.data=data;
+                this.seqNum=num;
     }
 	
     public String toString() {
-		return "Message[data="+data+"][num="+num+"]";
+		return "Message[data="+data+"][seqNum="+seqNum+"]";
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public int getSeqNum() {
+        return seqNum;
     }
 
     
