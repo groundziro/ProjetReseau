@@ -8,6 +8,7 @@ package reso.examples.gobackn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
 import reso.ip.IPLayer;
@@ -41,7 +42,7 @@ public class GbnSender extends GbnApplication{
                 fos = new FileOutputStream(file,true);
             }
             String newLine = System.getProperty("line.separator");
-            String s = ""+dudename+"  ->sending "+msg+newLine;
+            String s = "["+new Date(System.currentTimeMillis())+"]"+""+dudename+"  ->sending "+msg+newLine;
             fos.write(s.getBytes());
         }catch(IOException e){
             System.err.println(e.getMessage());

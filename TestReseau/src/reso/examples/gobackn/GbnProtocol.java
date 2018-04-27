@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import reso.ip.Datagram;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
@@ -84,7 +85,7 @@ public class GbnProtocol implements IPInterfaceListener {
             fos = new FileOutputStream(file,true);
         }
         String newLine = System.getProperty("line.separator");
-        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+newLine;
+        String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+newLine;
         fos.write(s.getBytes());
         }catch(IOException e){
             System.err.println(e.getMessage());
@@ -112,7 +113,7 @@ public class GbnProtocol implements IPInterfaceListener {
                 fos = new FileOutputStream(file,true);
             }
             String newLine = System.getProperty("line.separator");
-            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
+            String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
             fos.write(s.getBytes());
             }catch(IOException e){
                 System.err.println(e.getMessage());
