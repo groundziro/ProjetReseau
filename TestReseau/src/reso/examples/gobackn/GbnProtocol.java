@@ -5,6 +5,11 @@
  */
 package reso.examples.gobackn;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import reso.ip.Datagram;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
@@ -69,6 +74,19 @@ public class GbnProtocol implements IPInterfaceListener {
     public void receiveACK(IPInterfaceAdapter src, Datagram datagram) throws Exception{
         ACK ack = (ACK) datagram.getPayload();
         System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
+        File file = new File("Status.log");
+        if(!file.exists()){
+            file.createNewFile();
+            System.out.print("fichier créé");
+        }
+        FileWriter fos;
+        if(file.length()==0){
+            fos = new FileWriter(file,false);
+        }else{
+            fos = new FileWriter(file,true);
+        }
+        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received";
+        fos.write(s);        
         if(ack.getSeqNum()==applic.getSeqNum()){
             applic.incrmtSeqNum();
             DataMessage nextMsg=new DataMessage("coucou",applic.getSeqNum());
@@ -81,6 +99,19 @@ public class GbnProtocol implements IPInterfaceListener {
         DataMessage msg= (DataMessage) datagram.getPayload();
         if(msg.getSeqNum()==applic.getSeqNum()){
             System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
+            File file = new File("Status.log");
+            if(!file.exists()){
+                file.createNewFile();
+                System.out.print("fichier créé");
+            }
+            FileWriter fos;
+            if(file.length()==0){
+                fos = new FileWriter(file);
+            }else{
+                fos = new FileWriter(file,true);
+            }
+            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData();
+            fos.write(s);
             host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new ACK(applic.getSeqNum()));
             applic.incrmtSeqNum();
         }

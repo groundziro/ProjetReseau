@@ -5,6 +5,8 @@
  */
 package reso.examples.gobackn;
 
+import java.io.File;
+import java.io.FileWriter;
 import reso.common.AbstractApplication;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
@@ -30,6 +32,16 @@ public class GbnSender extends GbnApplication{
         ip.addListener(GbnProtocol.IP_PROTO_GBN, new GbnProtocol(this,(IPHost) host));
         DataMessage msg=new DataMessage("salut",seqNum);
         System.out.println(""+dudename+"  ->sending "+msg);
+        File file = new File("Status.log");
+        System.out.println("fichier créé");
+        FileWriter fos;
+        if(file.length()==0){
+            fos = new FileWriter(file,false);
+        }else{
+            fos = new FileWriter(file,true);
+        }
+        String s = ""+dudename+"  ->sending "+msg;
+        fos.write(s);
     	ip.send(IPAddress.ANY, dst, GbnProtocol.IP_PROTO_GBN,msg);
     }
 
