@@ -5,6 +5,7 @@
  */
 package reso.examples.gobackn;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -74,19 +75,22 @@ public class GbnProtocol implements IPInterfaceListener {
     public void receiveACK(IPInterfaceAdapter src, Datagram datagram) throws Exception{
         ACK ack = (ACK) datagram.getPayload();
         System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
-        File file = new File("Status.log");
-        if(!file.exists()){
-            file.createNewFile();
-            System.out.print("fichier créé");
-        }
-        FileWriter fos;
+        FileOutputStream fos = null;
+        try{
+            File file = new File("Status.log");
+            System.out.println("fichier créé");        
         if(file.length()==0){
-            fos = new FileWriter(file,false);
+            fos = new FileOutputStream(file,false);
         }else{
-            fos = new FileWriter(file,true);
+            fos = new FileOutputStream(file,true);
         }
-        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received";
-        fos.write(s);        
+        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received\n";
+        fos.write(s.getBytes());
+        }catch(IOException e){
+            System.err.println(e.getMessage());
+        }finally{
+            fos.close();
+        }
         if(ack.getSeqNum()==applic.getSeqNum()){
             applic.incrmtSeqNum();
             DataMessage nextMsg=new DataMessage("coucou",applic.getSeqNum());
@@ -99,19 +103,23 @@ public class GbnProtocol implements IPInterfaceListener {
         DataMessage msg= (DataMessage) datagram.getPayload();
         if(msg.getSeqNum()==applic.getSeqNum()){
             System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
-            File file = new File("Status.log");
-            if(!file.exists()){
-                file.createNewFile();
-                System.out.print("fichier créé");
-            }
-            FileWriter fos;
+            FileOutputStream fos = null;
+            try{
+                File file = new File("Status.log");
+                System.out.println("fichier créé");        
             if(file.length()==0){
-                fos = new FileWriter(file);
+                fos = new FileOutputStream(file,false);
             }else{
-                fos = new FileWriter(file,true);
+                fos = new FileOutputStream(file,true);
             }
-            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData();
-            fos.write(s);
+            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+"\n";
+            fos.write(s.getBytes());
+            }catch(IOException e){
+                System.err.println(e.getMessage());
+            }finally{
+                fos.close();
+            }
+       
             host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new ACK(applic.getSeqNum()));
             applic.incrmtSeqNum();
         }
