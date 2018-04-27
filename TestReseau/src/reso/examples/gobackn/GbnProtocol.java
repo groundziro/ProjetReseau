@@ -20,57 +20,69 @@ public class GbnProtocol implements IPInterfaceListener {
     public static final int IP_PROTO_GBN= Datagram.allocateProtocolNumber("GO-BACK-N");
     private final IPHost host; 
     private final boolean isSender;
-    private GbnSender sender;
-    private GbnReceiver receiver;
+    //private GbnSender sender;
+    //private GbnReceiver receiver;
+    private GbnApplication applic;
     
     public GbnProtocol(GbnSender sender, IPHost host) {
 	this.host= host;
-        this.sender=sender;
+        //this.sender=sender;
+        this.applic=sender;
         isSender=true;
     }
     
     public GbnProtocol(GbnSender sender){
         this.host=(IPHost) sender.getHost();
-        this.sender=sender;
+        //this.sender=sender;
+        this.applic=sender;
         isSender=true;
     }
     
     public GbnProtocol(GbnReceiver receiver, IPHost host) {
 	this.host= host;
-        this.receiver=receiver;
+        //this.receiver=receiver;
+        this.applic=receiver;
         isSender=false;
     }
     
     public GbnProtocol(GbnReceiver receiver){
         this.host=(IPHost) receiver.getHost();
-        this.receiver=receiver;
+        //this.receiver=receiver;
+        this.applic=receiver;
         isSender=false;
     }
 
     @Override
     public void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception {
-        if(isSender)
+        GbnMessage msg = (GbnMessage) datagram.getPayload();
+        
+        if(msg.getGbnMessType()=='a' && isSender){   //If the message is an ACK and this protocol concerns a sender
             receiveACK(src,datagram);
-        else
+        }
+        
+        else if(msg.getGbnMessType()=='m' && !isSender){  //If the message is an ACK and this protocol concerns a receiver
             receiveMsg(src,datagram);
+        }        
     }
 
     
     public void receiveACK(IPInterfaceAdapter src, Datagram datagram) throws Exception{
-        ACKmessage ack = (ACKmessage) datagram.getPayload();
-        System.out.println(""+sender.dudename+"  ACK n°"+ack.getSeqNum()+" received");
-        if(ack.getSeqNum()==sender.getSeqNum()){
-            sender.incrmtSeqNum();
-            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new GbnMessage("coucou",sender.getSeqNum()));
+        ACK ack = (ACK) datagram.getPayload();
+        System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
+        if(ack.getSeqNum()==applic.getSeqNum()){
+            applic.incrmtSeqNum();
+            DataMessage nextMsg=new DataMessage("coucou",applic.getSeqNum());
+            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, nextMsg);
+            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
         }
     }
     
     public void receiveMsg(IPInterfaceAdapter src, Datagram datagram) throws Exception{
-        GbnMessage msg= (GbnMessage) datagram.getPayload();
-        if(msg.getSeqNum()==receiver.getSeqNum()){
-            System.out.println(""+receiver.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
-            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new ACKmessage(receiver.getSeqNum()));
-            receiver.incrmtSeqNum();
+        DataMessage msg= (DataMessage) datagram.getPayload();
+        if(msg.getSeqNum()==applic.getSeqNum()){
+            System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
+            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new ACK(applic.getSeqNum()));
+            applic.incrmtSeqNum();
         }
     }
     

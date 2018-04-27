@@ -11,11 +11,11 @@ import reso.common.Message;
  *
  * @author Alfatta
  */
-public class ACKmessage implements Message{
-    	public final int seqNum; 
+public class ACK extends GbnMessage{
+    	
 	
-	public ACKmessage(int num) {
-		this.seqNum= num;
+	public ACK(int num) {
+            super(num);
 	}
 	
 	public String toString() {
@@ -30,6 +30,11 @@ public class ACKmessage implements Message{
 
     public int getSeqNum() {
         return seqNum;
+    }
+
+    @Override
+    public char getGbnMessType() {
+        return 'a';
     }
         
 }

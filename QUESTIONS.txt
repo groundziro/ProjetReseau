@@ -1,0 +1,6 @@
+controle de congestion A PART ou en meme temps avec boolean?
+un seul protocol mais deux applic avec boolean?
+taille de fenetre et tout devrait etre dans sender/receiver ou dans protocol?
+si multi receiver/listener ok? ACK commence random normalement
+
+QUI A LA WINDOW? SENDER OU PROTOCOL?

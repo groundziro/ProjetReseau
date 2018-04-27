@@ -39,7 +39,7 @@ public class BackNMain {
     			host1.addApplication(new AppSniffer(host1, new String [] {"eth0"}));
                 */
                 AbstractApplication sender = new GbnSender(host1, IP_ADDR2, false);
-                ((GbnSender)sender).dudename="sen1";
+                ((GbnSender)sender).dudename="sen0";
     		//sender.addToSendingQueue("1");
                 host1.addApplication(sender);
                 //sender.addToSendingQueue("2");
@@ -49,7 +49,7 @@ public class BackNMain {
     		host2.getIPLayer().addRoute(IP_ADDR1, "eth0");
                 
                 AbstractApplication receiver = new GbnReceiver(host2);
-                ((GbnReceiver)receiver).dudename="res1";
+                ((GbnReceiver)receiver).dudename="rec1";
     		host2.addApplication(receiver);
 
     		EthernetInterface h1_eth0= (EthernetInterface) host1.getInterfaceByName("eth0");

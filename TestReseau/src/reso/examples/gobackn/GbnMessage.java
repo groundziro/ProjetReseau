@@ -11,34 +11,18 @@ import reso.common.Message;
  *
  * @author Alfatta
  */
-public class GbnMessage implements Message{
-
-    
-    String data;
+public abstract class GbnMessage implements Message{
     public final int seqNum;
     
-    public GbnMessage(String data, int num) {
-		this.data=data;
-                this.seqNum=num;
-    }
-	
-    public String toString() {
-		return "Message[data="+data+"][seqNum="+seqNum+"]";
-    }
-
-    public String getData() {
-        return data;
+    public GbnMessage(int seqNum){
+        this.seqNum=seqNum;
     }
 
     public int getSeqNum() {
         return seqNum;
     }
-
     
-    @Override
-    public int getByteLength() {
-        return (data.getBytes().length)+(Integer.SIZE / 8);
-    }
+    abstract public char getGbnMessType();  //'a' or 'm'. This is important in case one node is both a sender and a receiver
+    
     
 }
-
