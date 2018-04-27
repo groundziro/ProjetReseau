@@ -78,13 +78,13 @@ public class GbnProtocol implements IPInterfaceListener {
         FileOutputStream fos = null;
         try{
             File file = new File("Status.log");
-            System.out.println("fichier créé");        
         if(file.length()==0){
             fos = new FileOutputStream(file,false);
         }else{
             fos = new FileOutputStream(file,true);
         }
-        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received\n";
+        String newLine = System.getProperty("line.separator");
+        String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+newLine;
         fos.write(s.getBytes());
         }catch(IOException e){
             System.err.println(e.getMessage());
@@ -106,13 +106,13 @@ public class GbnProtocol implements IPInterfaceListener {
             FileOutputStream fos = null;
             try{
                 File file = new File("Status.log");
-                System.out.println("fichier créé");        
             if(file.length()==0){
                 fos = new FileOutputStream(file,false);
             }else{
                 fos = new FileOutputStream(file,true);
             }
-            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+"\n";
+            String newLine = System.getProperty("line.separator");
+            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
             fos.write(s.getBytes());
             }catch(IOException e){
                 System.err.println(e.getMessage());
