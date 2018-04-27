@@ -24,7 +24,7 @@ public class GbnReceiver extends GbnApplication{
     }
 
     public void start() {
-       ip.addListener(GbnProtocol.IP_PROTO_GBN, new GbnProtocol(this,(IPHost) host));
+       ip.addListener(GbnReceivingProtocol.IP_PROTO_RECEIVING_GBN, GbnProtocol.makeProtocol(this,(IPHost) host));
     }
 	
     public void stop() {}

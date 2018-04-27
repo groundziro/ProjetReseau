@@ -14,14 +14,14 @@ import reso.common.Host;
  */
 public abstract class GbnApplication extends AbstractApplication{
     
-    protected int seqNum;          //For receiver: num of the next EXPECTED message
+    //protected int seqNum;          //For receiver: num of the next EXPECTED message
     public String dudename;      //For debugging purpose
     
     public GbnApplication(Host host, String name) {
         super(host, name);
-        seqNum=0;
+        //seqNum=0;
     }
-    
+    /*
     public int getSeqNum() {
         return seqNum;
     }
@@ -32,5 +32,5 @@ public abstract class GbnApplication extends AbstractApplication{
     public void incrmtSeqNum(){
         seqNum++;
     }
-    
+    */
 }

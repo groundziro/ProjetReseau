@@ -26,31 +26,17 @@ public class GbnSender extends GbnApplication{
     	this.dst= dst;
     	ip= host.getIPLayer();
     }
+
+    public IPAddress getDst() {
+        return dst;
+    }
     
     
     @Override
     public void start() throws Exception {
-        ip.addListener(GbnProtocol.IP_PROTO_GBN, new GbnProtocol(this,(IPHost) host));
-        DataMessage msg=new DataMessage("salut",seqNum);
-        System.out.println(""+dudename+"  ->sending "+msg);
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-                fos = new FileOutputStream(file,true);
-            }
-            String newLine = System.getProperty("line.separator");
-            String s = "["+new Date(System.currentTimeMillis())+"]"+""+dudename+"  ->sending "+msg+newLine;
-            fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
-        
-    	ip.send(IPAddress.ANY, dst, GbnProtocol.IP_PROTO_GBN,msg);
+        GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host);
+        ip.addListener(GbnSendingProtocol.IP_PROTO_SENDING_GBN, prot);
+        prot.basicSend(dst);
     }
 
     @Override

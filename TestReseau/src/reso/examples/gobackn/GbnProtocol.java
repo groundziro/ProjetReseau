@@ -22,108 +22,36 @@ import reso.ip.IPInterfaceListener;
  *
  * @author Alfatta
  */
-public class GbnProtocol implements IPInterfaceListener {
+public abstract class GbnProtocol implements IPInterfaceListener {
     
-    public static final int IP_PROTO_GBN= Datagram.allocateProtocolNumber("GO-BACK-N");
-    private final IPHost host; 
-    private final boolean isSender;
-    //private GbnSender sender;
-    //private GbnReceiver receiver;
-    private GbnApplication applic;
     
-    public GbnProtocol(GbnSender sender, IPHost host) {
+    protected final IPHost host; 
+    protected GbnApplication applic;
+    
+    static GbnReceivingProtocol makeProtocol(GbnReceiver receiver, IPHost host){
+        return new GbnReceivingProtocol(receiver,host);
+    }
+    static GbnReceivingProtocol makeProtocol(GbnReceiver receiver){
+        return new GbnReceivingProtocol(receiver);
+    }   
+    static GbnSendingProtocol makeProtocol(GbnSender sender, IPHost host){
+        return new GbnSendingProtocol(sender,host);
+    }
+    static GbnSendingProtocol makeProtocol(GbnSender sender){
+        return new GbnSendingProtocol(sender);
+    }
+    
+    public GbnProtocol(GbnApplication applic, IPHost host) {
 	this.host= host;
-        //this.sender=sender;
-        this.applic=sender;
-        isSender=true;
+        this.applic=applic;
     }
     
-    public GbnProtocol(GbnSender sender){
-        this.host=(IPHost) sender.getHost();
-        //this.sender=sender;
-        this.applic=sender;
-        isSender=true;
+    public GbnProtocol(GbnApplication applic){
+        this.host=(IPHost) applic.getHost();
+        this.applic=applic;
     }
     
-    public GbnProtocol(GbnReceiver receiver, IPHost host) {
-	this.host= host;
-        //this.receiver=receiver;
-        this.applic=receiver;
-        isSender=false;
-    }
-    
-    public GbnProtocol(GbnReceiver receiver){
-        this.host=(IPHost) receiver.getHost();
-        //this.receiver=receiver;
-        this.applic=receiver;
-        isSender=false;
-    }
-
     @Override
-    public void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception {
-        GbnMessage msg = (GbnMessage) datagram.getPayload();
-        
-        if(msg.getGbnMessType()=='a' && isSender){   //If the message is an ACK and this protocol concerns a sender
-            receiveACK(src,datagram);
-        }
-        
-        else if(msg.getGbnMessType()=='m' && !isSender){  //If the message is an ACK and this protocol concerns a receiver
-            receiveMsg(src,datagram);
-        }        
-    }
-
-    
-    public void receiveACK(IPInterfaceAdapter src, Datagram datagram) throws Exception{
-        ACK ack = (ACK) datagram.getPayload();
-        System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-        if(file.length()==0){
-            fos = new FileOutputStream(file,false);
-        }else{
-            fos = new FileOutputStream(file,true);
-        }
-        String newLine = System.getProperty("line.separator");
-        String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+newLine;
-        fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
-        if(ack.getSeqNum()==applic.getSeqNum()){
-            applic.incrmtSeqNum();
-            DataMessage nextMsg=new DataMessage("coucou",applic.getSeqNum());
-            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, nextMsg);
-            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
-        }
-    }
-    
-    public void receiveMsg(IPInterfaceAdapter src, Datagram datagram) throws Exception{
-        DataMessage msg= (DataMessage) datagram.getPayload();
-        if(msg.getSeqNum()==applic.getSeqNum()){
-            System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
-            FileOutputStream fos = null;
-            try{
-                File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-                fos = new FileOutputStream(file,true);
-            }
-            String newLine = System.getProperty("line.separator");
-            String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
-            fos.write(s.getBytes());
-            }catch(IOException e){
-                System.err.println(e.getMessage());
-            }finally{
-                fos.close();
-            }
-       
-            host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_GBN, new ACK(applic.getSeqNum()));
-            applic.incrmtSeqNum();
-        }
-    }
+    public abstract void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception;
     
 }
