@@ -88,6 +88,7 @@ public class GbnSendingProtocol extends GbnProtocol {
      */
     public void basicSend(IPAddress dst) throws Exception{
         tim.schedule(tDeadLine);
+        
         DataMessage nextMsg=new DataMessage("coucou",-1);
         System.out.println(""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         if(!RandomSimulator.shouldI(losePorcent))
@@ -152,6 +153,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void potentiallySend() throws Exception{
         if(nsq < ((GbnSender)applic).sendingQueue.size()){
             if(nsq<(base+N)){
+                /*
                 String dataToSend=((GbnSender)applic).getDataToSend(nsq);
                 DataMessage nextMsg=new DataMessage(dataToSend,nsq);
                 System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
@@ -159,6 +161,9 @@ public class GbnSendingProtocol extends GbnProtocol {
                     host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
                 else
                     System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
+                */
+                sendOneMessage(nsq);
+                
                 //if(nsq==base)
                 if(!tim.inProgress){
                     //System.out.println("yoyo");
@@ -175,8 +180,14 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
     }
     
-    public void sendOneMessage(int i){
-        
+    public void sendOneMessage(int i) throws Exception{
+        String dataToSend=((GbnSender)applic).getDataToSend(i);
+        DataMessage nextMsg=new DataMessage(dataToSend,i);
+        System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+        if(!RandomSimulator.shouldI(losePorcent))
+                    host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
+                else
+                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
     }
     
     /**
@@ -185,33 +196,16 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void timeOutReaction() throws Exception{
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         
-        
+        /*
         if(nsq==0){
             basicSend(((GbnSender)applic).getDst());
         }
-        else{
-            /*
-            String dataToSend=((GbnSender)applic).getDataToSend(base);
-            DataMessage nextMsg=new DataMessage(dataToSend,base);
-            System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-            host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-            */
-            
-            
+        else{          
             for(int j=base;j<nsq;j++){
-                //System.out.println("BASE = "+base+"    NSQ = "+nsq);
-                String dataToSend=((GbnSender)applic).getDataToSend(j);
-                DataMessage nextMsg=new DataMessage(dataToSend,j);
-                System.out.println(""+applic.dudename+"  ->sending BACK "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                //nsq++;
-                host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
+                sendOneMessage(j);
             }
-            
         }
-        
-        
-        
-        
+
         tim.cancel();
         
         tDeadLine=(int)(tDeadLine*1.5);
@@ -220,8 +214,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the network is dead");
             throw new Exception("Network appears to be dead");
         }
-        //tim.schedule(tDeadLine);
-        
-        
+        tim.schedule(tDeadLine);
+        */
     }
 }

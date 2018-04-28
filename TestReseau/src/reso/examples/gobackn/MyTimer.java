@@ -42,6 +42,7 @@ public class MyTimer extends Timer{
      * @param time Delay that we want to leave before the execution
      */
     public void schedule(int time){
+        
         this.time = time;
         if(theTask!=null)
             cancel(theTask);
@@ -64,7 +65,7 @@ public class MyTimer extends Timer{
      * Used to cancel the current to  when we don't want the timer to end.
      */
     public void cancel(TimerTask tt){
-        //System.out.println("<<<<<CANCEL>>>");
+       // System.out.println("<<<<<CANCEL>>>");
         tt.cancel();
         inProgress=false;
     }
