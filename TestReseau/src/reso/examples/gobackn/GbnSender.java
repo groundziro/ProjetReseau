@@ -21,7 +21,6 @@ import reso.ip.IPLayer;
 public class GbnSender extends GbnApplication{
     private final IPLayer ip;
     private final IPAddress dst;  //Supposant ici qu'on communiquera tout le temps avec le même Node
-    
     public ArrayList<String> sendingQueue;
 
     public GbnSender(IPHost host, IPAddress dst, boolean makeLose) {	
@@ -45,7 +44,7 @@ public class GbnSender extends GbnApplication{
     
     @Override
     public void start() throws Exception {
-        GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host);
+        GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP);
         ip.addListener(GbnSendingProtocol.IP_PROTO_SENDING_GBN, prot);
         prot.basicSend(dst);
     }

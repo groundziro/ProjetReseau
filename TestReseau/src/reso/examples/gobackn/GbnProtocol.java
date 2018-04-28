@@ -24,32 +24,63 @@ import reso.ip.IPInterfaceListener;
  */
 public abstract class GbnProtocol implements IPInterfaceListener {
     
-    
+    public int losePorcent;   //% of messages (ACK) lost during the sending/receiving process (simulated). if set to 0, the sender will never lose any package
     protected final IPHost host; 
     protected GbnApplication applic;
     
     static GbnReceivingProtocol makeProtocol(GbnReceiver receiver, IPHost host){
         return new GbnReceivingProtocol(receiver,host);
     }
+    static GbnReceivingProtocol makeProtocol(GbnReceiver receiver, IPHost host, int losP){
+        return new GbnReceivingProtocol(receiver,host,losP);
+    }
     static GbnReceivingProtocol makeProtocol(GbnReceiver receiver){
         return new GbnReceivingProtocol(receiver);
+    }   
+    static GbnReceivingProtocol makeProtocol(GbnReceiver receiver,int losP){
+        return new GbnReceivingProtocol(receiver,losP);
     }   
     static GbnSendingProtocol makeProtocol(GbnSender sender, IPHost host){
         return new GbnSendingProtocol(sender,host);
     }
+    static GbnSendingProtocol makeProtocol(GbnSender sender, IPHost host, int losP){
+        return new GbnSendingProtocol(sender,host,losP);
+    }
     static GbnSendingProtocol makeProtocol(GbnSender sender){
         return new GbnSendingProtocol(sender);
+    }
+    static GbnSendingProtocol makeProtocol(GbnSender sender, int losP){
+        return new GbnSendingProtocol(sender,losP);
     }
     
     public GbnProtocol(GbnApplication applic, IPHost host) {
 	this.host= host;
         this.applic=applic;
     }
-    
+    public GbnProtocol(GbnApplication applic, IPHost host, int lP) {
+	this.host= host;
+        this.applic=applic;
+        losePorcent=lP;
+    }
     public GbnProtocol(GbnApplication applic){
         this.host=(IPHost) applic.getHost();
         this.applic=applic;
     }
+    public GbnProtocol(GbnApplication applic, int lP){
+        this.host=(IPHost) applic.getHost();
+        this.applic=applic;
+        losePorcent=lP;
+    }
+
+    public void setLosePorcent(int losePorcent) {
+        this.losePorcent = losePorcent;
+    }
+
+    public int getLosePorcent() {
+        return losePorcent;
+    }
+    
+    
     
     @Override
     public abstract void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception;

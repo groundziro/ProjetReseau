@@ -25,14 +25,25 @@ public class GbnReceivingProtocol extends GbnProtocol{
     private int seqNum;
     
     
+    
+    
     public GbnReceivingProtocol(GbnReceiver receiver, IPHost host) {
         super(receiver, host);
         seqNum=-1;
     }
-
+    public GbnReceivingProtocol(GbnReceiver receiver, IPHost host, int losP) {
+        super(receiver, host);
+        seqNum=-1;
+        losePorcent=losP;
+    }
     public GbnReceivingProtocol(GbnReceiver receiver) {
         super(receiver);
         seqNum=-1;
+    }
+    public GbnReceivingProtocol(GbnReceiver receiver, int losP) {
+        super(receiver);
+        seqNum=-1;
+        losePorcent=losP;
     }
     
     /**
@@ -43,6 +54,7 @@ public class GbnReceivingProtocol extends GbnProtocol{
      */
     @Override
     public void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception{
+        //System.out.println("AH, ON RECOIT QQCH");
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
@@ -67,12 +79,18 @@ public class GbnReceivingProtocol extends GbnProtocol{
                 }
                 */
                 System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
+                if(!RandomSimulator.shouldI(losePorcent))
+                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
+                else
+                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
                 seqNum++;
             }
             else{
                 System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
+                if(!RandomSimulator.shouldI(losePorcent))
+                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
+                else
+                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
             }
         }
     }
