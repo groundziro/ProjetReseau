@@ -43,11 +43,13 @@ public class GbnReceivingProtocol extends GbnProtocol{
      */
     @Override
     public void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception{
+        
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
+            System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
             if(msg.getSeqNum()==seqNum){
-                System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
+                /*
                 FileOutputStream fos = null;
                 try{
                     File file = new File("Status.log");
@@ -64,6 +66,7 @@ public class GbnReceivingProtocol extends GbnProtocol{
                 }finally{
                     fos.close();
                 }
+                */
                 System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")");
                 host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
                 seqNum++;

@@ -62,8 +62,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         }finally{
             fos.close();
         }
-        host.getIPLayer().send(IPAddress.ANY, dst, GbnReceivingProtocol.IP_PROTO_RECEIVING_GBN,msg);
-        nsq++;
+        potentiallySend();
     }
     
     /**
@@ -79,24 +78,20 @@ public class GbnSendingProtocol extends GbnProtocol {
             ACK ack = (ACK) ms;
             System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
             if(ack.getSeqNum()>=base){
-                base=ack.getSeqNum();
+                base=ack.getSeqNum()+1;
+                potentiallySend();
             }
-            
-            if(ack.getSeqNum()==seqNum){
-                seqNum++;
-                DataMessage nextMsg=new DataMessage("coucou",seqNum);
-                host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_RECEIVING_GBN, nextMsg);
-                System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
-            }
+
         }
     }
     
     public void potentiallySend() throws Exception{
         if(nsq<(base+N)){
-            seqNum++;
-            DataMessage nextMsg=new DataMessage("coucou",seqNum);
+            DataMessage nextMsg=new DataMessage("coucou",nsq);
+            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);      
+            nsq++;            
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);            
+            //potentiallySend();
         }
     }
 }

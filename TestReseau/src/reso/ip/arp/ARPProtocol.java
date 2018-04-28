@@ -104,13 +104,15 @@ public class ARPProtocol {
     public void performARPRequest(final IPAddress addr, Datagram datagram)
     throws Exception {
     	ARPEntry entry= tableARP.get(addr);
-    	
     	/* An ARP Request is only sent if there is no entry */
+
     	if (entry == null) {
+
     		final ARPEntry newEntry= new ARPEntry();
     		tableARP.put(addr, newEntry);
     		EthernetFrame frame= new EthernetFrame(iface.addr, EthernetAddress.BROADCAST, EthernetFrame.PROTO.ARP,
         		ARPMessage.request(addr));
+
     		iface.send(frame);
     		/* Start timer for ARP response timeout */ 
     		iface.getNode().getNetwork().getScheduler().schedule(new AbstractEvent(iface.getNode().getNetwork().getScheduler().getCurrentTime() + 5) {
@@ -125,7 +127,7 @@ public class ARPProtocol {
     		if (agingTimer.isRunning())
     			agingTimer.start();
     	}
-    
+
     	/* The requesting datagram is queued. Only one datagram is queued per destination.
     	 * If another datagram was queued before, it will be replace by the newcomer. */
     	pendingARPTasks.put(addr, new TaskSendFrame(datagram, addr, iface));

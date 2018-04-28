@@ -149,18 +149,23 @@ public class IPLayer
      */
 	public void receive(IPInterfaceAdapter iface, Datagram msg)
 	throws Exception {
+            //System.out.println("yo");
 		// Raw listeners are called for any (IP) protocol, even if
 		// the datagram's destination is not this node
-		for (IPInterfaceListener l: rawListeners)
+		for (IPInterfaceListener l: rawListeners){
 			l.receive(iface, msg);
+               //         System.out.println("yo");
+                }
 		
 		// Datagrams addressed to this node
 		if (hasAddress(msg.dst) || msg.dst.isBroadcast()) {
 			List<IPInterfaceListener> listeners=
 				this.listeners.get(msg.getProtocol());
 			if (listeners != null)
-				for (IPInterfaceListener l: listeners)
+				for (IPInterfaceListener l: listeners){
+                                        //System.out.println("yo");
 					l.receive(iface, msg);
+                                }
 			return;
 		}
 		
@@ -351,7 +356,7 @@ public class IPLayer
     		datagram= new Datagram(src, dst, protocol, 255, payload);
     	} else
     		datagram= new Datagram(re.oif.getAddress(), dst, protocol, 255, payload);
-    	re.oif.send(datagram, re.gateway);
+        re.oif.send(datagram, re.gateway);
 	}
 
 }

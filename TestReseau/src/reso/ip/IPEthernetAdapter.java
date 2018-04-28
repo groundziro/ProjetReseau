@@ -44,29 +44,31 @@ implements MessageListener<EthernetFrame>, InterfaceAttrListener {
 
 	@Override
 	public void send(Datagram datagram, IPAddress gateway) throws Exception {
-    	if (!iface.isConnected()) {
-    		System.err.println("Interface is not connected [" + toString() + "]");
-    		return;
-    	}
-    	
-    	IPAddress ipAddr;
-    	if (gateway != null)
-    		ipAddr= gateway;
-    	else
-    		ipAddr= datagram.dst;
-    	
-    	EthernetAddress maddr;
-    	if (ipAddr.isBroadcast())
-    		maddr= EthernetAddress.BROADCAST;
-    	else
-    		maddr= arp.getMapping(ipAddr);
-    	
-    	if (maddr != null) {
-    		EthernetFrame frame= new EthernetFrame(iface.addr, maddr, EthernetFrame.PROTO.IP, datagram);
-    		iface.send(frame);
-    	} else {
-    		arp.performARPRequest(ipAddr, datagram);
-    	}
+
+            if (!iface.isConnected()) {
+                    System.err.println("Interface is not connected [" + toString() + "]");
+                    return;
+            }
+
+            IPAddress ipAddr;
+            if (gateway != null)
+                    ipAddr= gateway;
+            else
+                    ipAddr= datagram.dst;
+
+            EthernetAddress maddr;
+            if (ipAddr.isBroadcast())
+                    maddr= EthernetAddress.BROADCAST;
+            else
+                    maddr= arp.getMapping(ipAddr);
+
+            if (maddr != null) {
+                    EthernetFrame frame= new EthernetFrame(iface.addr, maddr, EthernetFrame.PROTO.IP, datagram);
+                    iface.send(frame);
+            } else {
+                  //  System.out.println("1111");
+                    arp.performARPRequest(ipAddr, datagram);
+            }
 	}
 
 	@Override

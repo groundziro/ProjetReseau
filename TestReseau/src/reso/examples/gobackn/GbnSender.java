@@ -36,7 +36,7 @@ public class GbnSender extends GbnApplication{
     public void start() throws Exception {
         GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host);
         ip.addListener(GbnSendingProtocol.IP_PROTO_SENDING_GBN, prot);
-        prot.basicSend(dst);
+        prot.potentiallySend();
     }
 
     @Override
