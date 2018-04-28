@@ -22,8 +22,10 @@ import reso.ip.IPInterfaceAdapter;
 public class GbnSendingProtocol extends GbnProtocol {
     public static final int IP_PROTO_SENDING_GBN= Datagram.allocateProtocolNumber("SENDING-GO-BACK-N");
     
-    private int nsq;         //next sequence number. the next send message will have this sequence number (except a loss is detected)
-    private int base;        //the sequence number of the first pack in the window (= the seq number of the oldest send bu not ACKed message)
+    private MyTimer tim;
+    
+    private int nsq;         //next sequence number. the next send message will have this sequence number (except a loss is detected). nsq=-1 when collection not established
+    private int base;        //the sequence number of the first pack in the window (= the seq number of the oldest send bu not ACKed message). base=-1 reserver to start
     private int N;           //the size of the window. we can't send a message with a seqNum >= base+N
     
     private int time0;       //the last time the timer has been reset, in scheduler time
@@ -31,32 +33,39 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     public GbnSendingProtocol(GbnSender sender, IPHost host) {
         super(sender, host);
-        nsq=0;
-        base=0;
+        nsq=-1;
+        base=-1;
         N=8;
         time0=0;
         tDeadLine=250;
+        tim=new MyTimer(this);
     }
 
     public GbnSendingProtocol(GbnSender sender) {
         super(sender);
-        nsq=0;
-        base=0;
+        nsq=-1;
+        base=-1;
         N=8;
         time0=0;
         tDeadLine=250;
+        tim=new MyTimer(this);
     }
     
     /**
      * Called after a timeout. Resent potentially lost messages
      */
-    public void resent(){
+    public void timeOutReaction(){
         
     }
     
+    /**
+     * Send message with seq num = -1 to establish connection
+     * @param dst
+     * @throws Exception
+     */
     public void basicSend(IPAddress dst) throws Exception{
-        DataMessage nextMsg=new DataMessage("salut",nsq);
-        System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+        DataMessage nextMsg=new DataMessage("coucou",nsq);
+        System.out.println(""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg); 
         nsq++;
         /*
@@ -102,16 +111,14 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
     }
 
-    public void potentiallySend() throws Exception{
-        /*
+    public void potentiallySend() throws Exception{  
         if(nsq<(base+N)){
-            DataMessage nextMsg=new DataMessage("coucou",nsq);
+            String dataToSend=((GbnSender)applic).sendingQueue.get(nsq);
+            DataMessage nextMsg=new DataMessage(dataToSend,nsq);
             System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             nsq++;
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);            
             potentiallySend();
         }
-        */
-
     }
 }

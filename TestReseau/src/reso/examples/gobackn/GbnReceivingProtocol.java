@@ -27,12 +27,12 @@ public class GbnReceivingProtocol extends GbnProtocol{
     
     public GbnReceivingProtocol(GbnReceiver receiver, IPHost host) {
         super(receiver, host);
-        seqNum=0;
+        seqNum=-1;
     }
 
     public GbnReceivingProtocol(GbnReceiver receiver) {
         super(receiver);
-        seqNum=0;
+        seqNum=-1;
     }
     
     /**

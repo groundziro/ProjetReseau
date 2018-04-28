@@ -43,7 +43,9 @@ public class BackNMain {
     		//sender.addToSendingQueue("1");
                 host1.addApplication(sender);
                 //sender.addToSendingQueue("2");
-                //while() ENVOYERP PLEIN DE PACKAGE C'EST LA FETE
+                for(int i=0;i<80;i++){      //PLEIN DE PACKAGES A ENVOYER
+                    ((GbnSender)sender).addToSendingQueue("<data_n°"+String.valueOf(i)+">");
+                }
                 
     		IPHost host2= NetworkBuilder.createHost(network,"H2", IP_ADDR2, MAC_ADDR2);
     		host2.getIPLayer().addRoute(IP_ADDR1, "eth0");

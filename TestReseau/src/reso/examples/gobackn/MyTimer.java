@@ -14,12 +14,12 @@ import java.util.TimerTask;
  */
 public class MyTimer extends Timer{
     TimerTask tim;
-    private final GbnProtocol prot;
+    private final GbnSendingProtocol prot;
     /**
      * Constructor classic.
      * @param protocol 
      */
-   public MyTimer(GbnProtocol protocol){
+   public MyTimer(GbnSendingProtocol protocol){
         prot = protocol;
     }
     /**
@@ -62,7 +62,8 @@ public class MyTimer extends Timer{
      */
     public void WorkToDo(TimerTask tt){
         //prot.GererTimeOut();
-        System.out.println(this);
+        prot.timeOutReaction();
+        System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         cancel(tt); // A LAISSER ABSOLUMENT A LA FIN
     }
 }
