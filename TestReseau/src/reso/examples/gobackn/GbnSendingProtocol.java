@@ -88,10 +88,10 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void potentiallySend() throws Exception{
         if(nsq<(base+N)){
             DataMessage nextMsg=new DataMessage("coucou",nsq);
-            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);      
-            nsq++;            
-            host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
+            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
+            nsq++;
             potentiallySend();
+            host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);            
         }
     }
 }
