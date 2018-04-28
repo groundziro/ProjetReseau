@@ -44,6 +44,11 @@ public class GbnSendingProtocol extends GbnProtocol {
     }
     
     public void basicSend(IPAddress dst) throws Exception{
+        DataMessage nextMsg=new DataMessage("salut",nsq);
+        System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
+        host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg); 
+        nsq++;
+        /*
         DataMessage msg=new DataMessage("salut",0);
         System.out.println(""+applic.dudename+"  ->sending "+msg);
         FileOutputStream fos = null;
@@ -63,6 +68,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             fos.close();
         }
         potentiallySend();
+        */
     }
     
     /**
@@ -90,8 +96,8 @@ public class GbnSendingProtocol extends GbnProtocol {
             DataMessage nextMsg=new DataMessage("coucou",nsq);
             System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
             nsq++;
-            potentiallySend();
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);            
+            potentiallySend();
         }
     }
 }
