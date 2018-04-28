@@ -8,6 +8,7 @@ package reso.examples.gobackn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
@@ -20,15 +21,22 @@ import reso.ip.IPLayer;
 public class GbnSender extends GbnApplication{
     private final IPLayer ip;
     private final IPAddress dst;  //Supposant ici qu'on communiquera tout le temps avec le même Node
+    
+    public ArrayList<String> toSend;
 
     public GbnSender(IPHost host, IPAddress dst, boolean makeLose) {	
     	super(host, "sender");
     	this.dst= dst;
     	ip= host.getIPLayer();
+        toSend=new ArrayList<String>();
     }
 
     public IPAddress getDst() {
         return dst;
+    }
+    
+    public void addToSend(String s){
+        toSend.add(s);
     }
     
     
