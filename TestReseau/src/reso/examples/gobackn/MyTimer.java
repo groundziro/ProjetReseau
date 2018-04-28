@@ -15,7 +15,8 @@ import java.util.logging.Logger;
  * @author Thomas
  */
 public class MyTimer extends Timer{
-    TimerTask tim;
+    public boolean inProgress;
+    TimerTask theTask;
     int time;
     private final GbnSendingProtocol prot;
     /**
@@ -24,6 +25,7 @@ public class MyTimer extends Timer{
      */
    public MyTimer(GbnSendingProtocol protocol){
         prot = protocol;
+        inProgress=false;
     }
     /**
      * Constructor for debug essentially
@@ -31,6 +33,7 @@ public class MyTimer extends Timer{
      */
     public MyTimer(int time){
         prot = null;
+        inProgress=false;
         schedule(time);
     }
     
@@ -40,8 +43,9 @@ public class MyTimer extends Timer{
      */
     public void schedule(int time){
         this.time = time;
-        if(tim!=null)
-            cancel(tim);
+        if(theTask!=null)
+            cancel(theTask);
+        System.out.println("<<<<<SCHEDULE>>>>>");
         TimerTask tt = new TimerTask(){
             @Override 
             public void run(){
@@ -52,14 +56,17 @@ public class MyTimer extends Timer{
                 }
             }
         };
-        tim=tt;
+        theTask=tt;
+        inProgress=true;
         super.schedule(tt, time);
     }
     /**
      * Used to cancel the current to  when we don't want the timer to end.
      */
     public void cancel(TimerTask tt){
+        System.out.println("<<<<<CANCEL>>>");
         tt.cancel();
+        inProgress=false;
     }
     /**
      * Method to terminate the timer when we don't need it anymore.
@@ -69,10 +76,11 @@ public class MyTimer extends Timer{
     }
     
     public long getElapsedTime(){
-        return Math.abs(System.currentTimeMillis()- tim.scheduledExecutionTime()+time);
+        //System.out.println("<--->"+theTask.scheduledExecutionTime());
+        return Math.abs(System.currentTimeMillis()- theTask.scheduledExecutionTime()+time);
     }
     public void cancel(){
-        cancel(tim);
+        cancel(theTask);
     }
     /**
      * Method that will launch what we need for the timeout event.
