@@ -24,6 +24,9 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     private MyTimer tim;
     
+    int w;
+    int new0;
+    
     private int nsq;         //next sequence number. the next send message will have this sequence number (except a loss is detected). nsq=-1 when collection not established
     private int base;        //the sequence number of the first pack in the window (= the seq number of the oldest send bu not ACKed message). base=-1 reserver to start
     private int N;           //the size of the window. we can't send a message with a seqNum >= base+N
@@ -36,8 +39,9 @@ public class GbnSendingProtocol extends GbnProtocol {
         nsq=-1;
         base=-1;
         N=8;
-        tDeadLine=500;
+        tDeadLine=300;
         tim=new MyTimer(this);
+        w=-1; new0=0;
     }
 
     public GbnSendingProtocol(GbnSender sender) {
@@ -47,6 +51,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         N=8;
         tDeadLine=500;
         tim=new MyTimer(this);
+        w=-1; new0=0;
     }
     
 
@@ -58,8 +63,6 @@ public class GbnSendingProtocol extends GbnProtocol {
      */
     public void basicSend(IPAddress dst) throws Exception{
         tim.schedule(tDeadLine);
-        Thread.sleep(300);
-        System.out.println("oooooo"+tim.getElapsedTime());
         DataMessage nextMsg=new DataMessage("coucou",-1);
         System.out.println(""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg); 
@@ -101,7 +104,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             ACK ack = (ACK) ms;
             System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             if(ack.getSeqNum()>=base){
-                System.out.println("<"+(int)tim.getElapsedTime()+">");
+                //System.out.println("<"+(int)tim.getElapsedTime()+">");
                 /*
                 if(ack.getSeqNum()==-1){
                     tDeadLine=(int)(host.getNetwork().getScheduler().getCurrentTime()*1000*2.5);
@@ -115,6 +118,14 @@ public class GbnSendingProtocol extends GbnProtocol {
                 //tDeadLine=elapsedTime;
                 //System.out.println("[tDeadLine actualised to "+tDeadLine+"ms]");
                 //tim.cancel();
+                if(ack.getSeqNum()==w){
+                    tim.cancel();
+                    int timeTaken=(int)(host.getNetwork().getScheduler().getCurrentTime()*1000) - new0;
+                    timeTaken=(int)(timeTaken*2.5);
+                    tDeadLine=(tDeadLine+timeTaken)/2;
+                    System.out.println("[tDeadLine actualised to "+tDeadLine+"]");
+                    new0=(int) (host.getNetwork().getScheduler().getCurrentTime()*1000);
+                }
                 potentiallySend();
             }
 
@@ -127,11 +138,15 @@ public class GbnSendingProtocol extends GbnProtocol {
                 String dataToSend=((GbnSender)applic).getDataToSend(nsq);
                 DataMessage nextMsg=new DataMessage(dataToSend,nsq);
                 System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                nsq++;
+                
                 host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
                 //if(nsq==base)
-                //if(!tim.inProgress)
-                tim.schedule(tDeadLine);
+                if(!tim.inProgress){
+                    //System.out.println("yoyo");
+                    tim.schedule(tDeadLine);
+                    w=nsq;
+                }
+                nsq++;
                 potentiallySend();
             }
         }
@@ -158,10 +173,13 @@ public class GbnSendingProtocol extends GbnProtocol {
                 host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);  
             }
         }
-        /*
+        
         tDeadLine=(int)(tDeadLine*1.5);
         System.out.println("[tDeadLine actualised to "+tDeadLine+"ms]");
-        */
+        if(tDeadLine>5000){
+            System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the network is dead");
+            throw new Exception("Network appears to be dead");
+        }
         tim.schedule(tDeadLine);
     }
 }
