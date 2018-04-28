@@ -34,27 +34,27 @@ public class MyTimer extends Timer{
      * @param time Delay that we want to leave before the execution
      */
     public void schedule(int time){
-        super.schedule(new TimerTask(){
+        TimerTask tt = new TimerTask(){
             @Override 
             public void run(){
-               WorkToDo();
+               WorkToDo(this);
             }
-        }, time);
+        };
+        super.schedule(tt, time);
     }
     /**
      * Used to cancel the timer when we don't want the timer to end.
      */
-    @Override
-    public void cancel(){
-        super.cancel();
+    public void cancel(TimerTask tt){
+        tt.cancel();
     }
     /**
      * Method that will launch what we need for the timeout event.
      */
-    public void WorkToDo(){
+    public void WorkToDo(TimerTask tt){
         //prot.GererTimeOut();
         System.out.println(this);
-        cancel(); // A LAISSER ABSOLUMENT A LA FIN
+        cancel(tt); // A LAISSER ABSOLUMENT A LA FIN
     }
 }
 
