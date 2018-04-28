@@ -91,7 +91,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             System.out.println(""+applic.dudename+"  ->sending "+nextMsg);      
             nsq++;            
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-            //potentiallySend();
+            potentiallySend();
         }
     }
 }

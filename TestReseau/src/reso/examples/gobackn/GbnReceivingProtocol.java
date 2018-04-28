@@ -43,7 +43,6 @@ public class GbnReceivingProtocol extends GbnProtocol{
      */
     @Override
     public void receive(IPInterfaceAdapter src, Datagram datagram) throws Exception{
-        
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
