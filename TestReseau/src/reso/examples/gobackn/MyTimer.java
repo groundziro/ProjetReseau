@@ -13,6 +13,7 @@ import java.util.TimerTask;
  * @author Thomas
  */
 public class MyTimer extends Timer{
+    TimerTask tim;
     private final GbnProtocol prot;
     /**
      * Constructor classic.
@@ -29,17 +30,21 @@ public class MyTimer extends Timer{
         prot = null;
         schedule(time);
     }
+    
     /**
      * The method for the task scheduling.
      * @param time Delay that we want to leave before the execution
      */
     public void schedule(int time){
+        if(tim!=null)
+            cancel(tim);
         TimerTask tt = new TimerTask(){
             @Override 
             public void run(){
                WorkToDo(this);
             }
         };
+        tim=tt;
         super.schedule(tt, time);
     }
     /**
@@ -47,6 +52,10 @@ public class MyTimer extends Timer{
      */
     public void cancel(TimerTask tt){
         tt.cancel();
+    }
+    
+    public void cancel(){
+        cancel(tim);
     }
     /**
      * Method that will launch what we need for the timeout event.
