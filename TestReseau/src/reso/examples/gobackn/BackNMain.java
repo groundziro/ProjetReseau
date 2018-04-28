@@ -62,7 +62,7 @@ public class BackNMain {
 
                 
                 RandomSimulator.receivingLosP=0;
-                RandomSimulator.sendingLosP=0;
+                RandomSimulator.sendingLosP=3;       //Each package send has 3% chance to be lost
                 
     		host1.start();
     		host2.start();

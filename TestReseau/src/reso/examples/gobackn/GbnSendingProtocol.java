@@ -185,9 +185,16 @@ public class GbnSendingProtocol extends GbnProtocol {
         DataMessage nextMsg=new DataMessage(dataToSend,i);
         System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         if(!RandomSimulator.shouldI(losePorcent))
-                    host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-                else
-                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
+            host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
+        else
+            System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
+    }
+    
+    public void sendWithNoLoss(int i) throws Exception{
+        String dataToSend=((GbnSender)applic).getDataToSend(i);
+        DataMessage nextMsg=new DataMessage(dataToSend,i);
+        System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+        host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
     }
     
     /**
@@ -195,14 +202,15 @@ public class GbnSendingProtocol extends GbnProtocol {
     */
     public void timeOutReaction() throws Exception{
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
+
         
-        /*
         if(nsq==0){
             basicSend(((GbnSender)applic).getDst());
         }
         else{          
             for(int j=base;j<nsq;j++){
                 sendOneMessage(j);
+                //sendWithNoLoss(j);
             }
         }
 
@@ -211,10 +219,10 @@ public class GbnSendingProtocol extends GbnProtocol {
         tDeadLine=(int)(tDeadLine*1.5);
         System.out.println("[tDeadLine actualised to "+tDeadLine+"ms]");
         if(tDeadLine>5000){
-            System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the network is dead");
+            System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore");
             throw new Exception("Network appears to be dead");
         }
-        tim.schedule(tDeadLine);
-        */
+        //tim.schedule(tDeadLine);
+        
     }
 }
