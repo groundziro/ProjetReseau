@@ -21,31 +21,42 @@ import reso.ip.IPInterfaceAdapter;
  */
 public class GbnSendingProtocol extends GbnProtocol {
     public static final int IP_PROTO_SENDING_GBN= Datagram.allocateProtocolNumber("SENDING-GO-BACK-N");
-    private int seqNum;
     
-    private int nsq;   //next sequence number. the next send message will have this sequence number (except a loss is detected)
-    private int base;  //the sequence number of the first pack in the window (= the seq number of the oldest send bu not ACKed message)
-    private int N;     //the size of the window. we can't send a message with a seqNum >= base+N
+    private int nsq;         //next sequence number. the next send message will have this sequence number (except a loss is detected)
+    private int base;        //the sequence number of the first pack in the window (= the seq number of the oldest send bu not ACKed message)
+    private int N;           //the size of the window. we can't send a message with a seqNum >= base+N
+    
+    private int time0;       //the last time the timer has been reset, in scheduler time
+    private int tDeadLine;   //how much time (in ms) the timer will wait an ACK befaure considering the corresponding message as a loss
     
     public GbnSendingProtocol(GbnSender sender, IPHost host) {
         super(sender, host);
-        seqNum=0;
         nsq=0;
         base=0;
         N=8;
+        time0=0;
+        tDeadLine=250;
     }
 
     public GbnSendingProtocol(GbnSender sender) {
         super(sender);
-        seqNum=0;
         nsq=0;
         base=0;
         N=8;
+        time0=0;
+        tDeadLine=250;
+    }
+    
+    /**
+     * Called after a timeout. Resent potentially lost messages
+     */
+    public void resent(){
+        
     }
     
     public void basicSend(IPAddress dst) throws Exception{
         DataMessage nextMsg=new DataMessage("salut",nsq);
-        System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
+        System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg); 
         nsq++;
         /*
@@ -82,7 +93,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='a'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             ACK ack = (ACK) ms;
-            System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received");
+            System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             if(ack.getSeqNum()>=base){
                 base=ack.getSeqNum()+1;
                 potentiallySend();
@@ -90,14 +101,17 @@ public class GbnSendingProtocol extends GbnProtocol {
 
         }
     }
-    
+
     public void potentiallySend() throws Exception{
+        /*
         if(nsq<(base+N)){
             DataMessage nextMsg=new DataMessage("coucou",nsq);
-            System.out.println(""+applic.dudename+"  ->sending "+nextMsg);
+            System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             nsq++;
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);            
             potentiallySend();
         }
+        */
+
     }
 }

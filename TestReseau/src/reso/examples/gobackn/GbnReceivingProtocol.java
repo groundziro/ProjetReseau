@@ -46,7 +46,7 @@ public class GbnReceivingProtocol extends GbnProtocol{
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
-            System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData());
+            System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             if(msg.getSeqNum()==seqNum){
                 /*
                 FileOutputStream fos = null;
@@ -66,12 +66,12 @@ public class GbnReceivingProtocol extends GbnProtocol{
                     fos.close();
                 }
                 */
-                System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")");
+                System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
                 host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
                 seqNum++;
             }
             else{
-                System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")");
+                System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
                 host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
             }
         }
