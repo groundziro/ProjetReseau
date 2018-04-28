@@ -1,0 +1,25 @@
+<project name="" default="run">
+    <target name="build">
+	<mkdir dir="build"/>
+        <javac srcdir="TestReseau/src/" destdir="build" classpath="lib/junit-4.12.jar" includeantruntime="false"/>
+    </target>
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+<!--<target name="jar" depends="build">
+	<mkdir dir="build/jar"/>
+	<jar destfile="build/jar/SQLiteDFManager.jar" basedir="build/classes">
+	  <zipgroupfileset dir="lib" includes="sqlite-jdbc-3.20.0.jar"/>
+	  <manifest>
+		<attribute name="Interface"  value="main"/>
+		<attribute name="Main-Class" value="GUI.Interface"/>
+	  </manifest>
+	</jar>
+</target>-->
+    <target name="run" depends="build">
+        <java classname="reso.examples.gobackn.BackNMain"
+                    fork="true"
+                    classpath="build"/>
+    </target>
+
+</project>
