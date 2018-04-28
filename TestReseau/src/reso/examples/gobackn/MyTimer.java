@@ -48,12 +48,17 @@ public class MyTimer extends Timer{
         super.schedule(tt, time);
     }
     /**
-     * Used to cancel the timer when we don't want the timer to end.
+     * Used to cancel the current to  when we don't want the timer to end.
      */
     public void cancel(TimerTask tt){
         tt.cancel();
     }
-    
+    /**
+     * Method to terminate the timer when we don't need it anymore.
+     */
+    public void terminate(){
+        super.cancel();
+    }
     public void cancel(){
         cancel(tim);
     }
