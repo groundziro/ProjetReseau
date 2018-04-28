@@ -16,6 +16,7 @@ import java.util.logging.Logger;
  */
 public class MyTimer extends Timer{
     TimerTask tim;
+    int time;
     private final GbnSendingProtocol prot;
     /**
      * Constructor classic.
@@ -38,6 +39,7 @@ public class MyTimer extends Timer{
      * @param time Delay that we want to leave before the execution
      */
     public void schedule(int time){
+        this.time = time;
         if(tim!=null)
             cancel(tim);
         TimerTask tt = new TimerTask(){
@@ -64,6 +66,10 @@ public class MyTimer extends Timer{
      */
     public void terminate(){
         super.cancel();
+    }
+    
+    public long getElapsedTime(){
+        return Math.abs(System.currentTimeMillis()- tim.scheduledExecutionTime()+time);
     }
     public void cancel(){
         cancel(tim);
