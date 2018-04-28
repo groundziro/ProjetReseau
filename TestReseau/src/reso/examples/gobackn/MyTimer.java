@@ -45,7 +45,7 @@ public class MyTimer extends Timer{
         this.time = time;
         if(theTask!=null)
             cancel(theTask);
-        System.out.println("<<<<<SCHEDULE>>>>>");
+        //System.out.println("<<<<<SCHEDULE>>>>>");
         TimerTask tt = new TimerTask(){
             @Override 
             public void run(){
@@ -64,7 +64,7 @@ public class MyTimer extends Timer{
      * Used to cancel the current to  when we don't want the timer to end.
      */
     public void cancel(TimerTask tt){
-        System.out.println("<<<<<CANCEL>>>");
+        //System.out.println("<<<<<CANCEL>>>");
         tt.cancel();
         inProgress=false;
     }
