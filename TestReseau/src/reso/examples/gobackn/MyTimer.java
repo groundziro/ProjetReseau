@@ -7,6 +7,8 @@ package reso.examples.gobackn;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -41,7 +43,11 @@ public class MyTimer extends Timer{
         TimerTask tt = new TimerTask(){
             @Override 
             public void run(){
-               WorkToDo(this);
+                try {
+                    WorkToDo(this);
+                } catch (Exception ex) {
+                    Logger.getLogger(MyTimer.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
         tim=tt;
@@ -65,10 +71,8 @@ public class MyTimer extends Timer{
     /**
      * Method that will launch what we need for the timeout event.
      */
-    public void WorkToDo(TimerTask tt){
-        //prot.GererTimeOut();
+    public void WorkToDo(TimerTask tt) throws Exception{
         prot.timeOutReaction();
-        System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         cancel(tt); // A LAISSER ABSOLUMENT A LA FIN
     }
 }

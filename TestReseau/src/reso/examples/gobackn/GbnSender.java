@@ -39,6 +39,9 @@ public class GbnSender extends GbnApplication{
         sendingQueue.add(s);
     }
     
+    public String getDataToSend(int i){
+        return sendingQueue.get(i);
+    }
     
     @Override
     public void start() throws Exception {
