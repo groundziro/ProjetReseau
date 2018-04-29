@@ -59,9 +59,30 @@ public class GbnReceivingProtocol extends GbnProtocol{
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
             System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+            String newLine = System.getProperty("line.separator");
+            String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
             if(msg.getSeqNum()==seqNum){
-                /*
-                FileOutputStream fos = null;
+                System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+                s+="["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
+                if(!RandomSimulator.shouldI(losePorcent))
+                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
+                else{
+                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
+                    s+= "!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
+                }
+                seqNum++;
+            }
+            else{
+                System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+                s+="["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
+                if(!RandomSimulator.shouldI(losePorcent))
+                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
+                else{
+                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
+                    s+="!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
+                }
+            }
+            FileOutputStream fos = null;
                 try{
                     File file = new File("Status.log");
                 if(file.length()==0){
@@ -69,29 +90,12 @@ public class GbnReceivingProtocol extends GbnProtocol{
                 }else{
                     fos = new FileOutputStream(file,true);
                 }
-                String newLine = System.getProperty("line.separator");
-                String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
                 fos.write(s.getBytes());
                 }catch(IOException e){
                     System.err.println(e.getMessage());
                 }finally{
                     fos.close();
                 }
-                */
-                System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                if(!RandomSimulator.shouldI(losePorcent))
-                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
-                else
-                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
-                seqNum++;
-            }
-            else{
-                System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                if(!RandomSimulator.shouldI(losePorcent))
-                    host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
-                else
-                    System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
-            }
         }
     }
 }
