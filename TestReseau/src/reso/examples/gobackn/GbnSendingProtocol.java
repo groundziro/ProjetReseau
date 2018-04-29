@@ -35,6 +35,9 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     private int tDeadLine;   //how much time (in ms) the timer will wait an ACK befaure considering the corresponding message as a loss
     
+    private double current; //current size of the window for additive increase. N will be modified only if (int) current > N.
+    private int ssthresh; //threshold of the slow start.
+    
     public GbnSendingProtocol(GbnSender sender, IPHost host) {
         super(sender, host);
         nsq=-1;
@@ -323,5 +326,37 @@ public class GbnSendingProtocol extends GbnProtocol {
         }*/
         //tim.schedule(tDeadLine);
         
+    }
+    /**
+     * That's for an example of additive increase so not definitive.
+     */
+    public void additive(){
+        int newN = N;
+        current+=(double)1/newN; 
+        update();
+    }
+    /**
+     * Example of multiplicative decrease.
+     */
+    public void multiplicative(){
+        int newN = N;
+        newN/=2;
+        current = newN;
+    }
+    /**
+     * Example of slow start.
+     */
+    public void slowStart(){
+        int newN = N;
+        if(newN > ssthresh)
+            newN++;
+    }
+    /**
+     * Updates the value of N.
+     */
+    public void update(){
+        int newN = N;
+        if((int) current > newN)
+            newN=(int) current;
     }
 }
