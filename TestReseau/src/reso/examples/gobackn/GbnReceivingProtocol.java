@@ -60,10 +60,10 @@ public class GbnReceivingProtocol extends GbnProtocol{
             DataMessage msg= (DataMessage) ms;
             System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             String newLine = System.getProperty("line.separator");
-            String s = "["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+newLine;
+            String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData();
             if(msg.getSeqNum()==seqNum){
                 System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                s+="["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
+                s+="  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
                 if(!RandomSimulator.shouldI(losePorcent))
                     host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum));
                 else{
@@ -74,7 +74,7 @@ public class GbnReceivingProtocol extends GbnProtocol{
             }
             else{
                 System.out.println(""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                s+="["+new Date(System.currentTimeMillis())+"]"+""+applic.dudename+"  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
+                s+="  ->sending ACK("+(seqNum-1)+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
                 if(!RandomSimulator.shouldI(losePorcent))
                     host.getIPLayer().send(IPAddress.ANY, datagram.src, IP_PROTO_SENDING_GBN, new ACK(seqNum-1));
                 else{
