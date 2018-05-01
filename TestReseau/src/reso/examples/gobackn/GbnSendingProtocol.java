@@ -158,11 +158,14 @@ public class GbnSendingProtocol extends GbnProtocol {
                 String dataToSend=((GbnSender)applic).getDataToSend(nsq);
                 DataMessage nextMsg=new DataMessage(dataToSend,nsq);
                 System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+                String s = ""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
                 if(!RandomSimulator.shouldI(losePorcent))
                     host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-                else
+                else{
                     System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
-                
+                    s+="!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
+                }
+                log(s);
                 //sendOneMessage(nsq);
                 
                 //if(nsq==base)
