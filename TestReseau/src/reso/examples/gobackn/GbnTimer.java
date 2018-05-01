@@ -48,6 +48,7 @@ public class GbnTimer{
         if(tmp!=null)
             tmp.stop();
         inProgress=false;
+       // System.out.println("CANCELLED");
     }
 
     

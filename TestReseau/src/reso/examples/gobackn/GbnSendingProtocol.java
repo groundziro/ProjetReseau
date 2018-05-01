@@ -203,7 +203,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             }
         }
         else{            //Work is done
-         //   tim.cancel();
+            tim.ScheduleTimeOut(tDeadLine);  //Last timer to check if everything is done
         }
     }
     
@@ -264,6 +264,11 @@ public class GbnSendingProtocol extends GbnProtocol {
     * Called after a timeout. Resent potentially lost messages
     */
     public void timeOutReaction() throws Exception{
+        if(base==((GbnSender)applic).sendingQueue.size()){
+            System.out.println("WORK IS DONE");
+            return;
+        }
+        
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         String newLine = System.getProperty("line.separator");
         String s = "<><><><><><> TIMEOUT <><><><><><>"+newLine;
