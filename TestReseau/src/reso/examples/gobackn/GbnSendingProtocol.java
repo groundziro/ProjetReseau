@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import reso.common.AbstractTimer;
 import static reso.examples.gobackn.GbnReceivingProtocol.IP_PROTO_RECEIVING_GBN;
 import reso.ip.Datagram;
@@ -25,7 +27,7 @@ import reso.scheduler.Scheduler;
 public class GbnSendingProtocol extends GbnProtocol {
     public static final int IP_PROTO_SENDING_GBN= Datagram.allocateProtocolNumber("SENDING-GO-BACK-N");
     
- 
+    public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     
     private GbnTimer tim;
     
@@ -97,8 +99,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void basicSend(IPAddress dst) throws Exception{
         tim.ScheduleTimeOut(tDeadLine);
         DataMessage nextMsg=new DataMessage("coucou",-1);
-        String newLine = System.getProperty("line.separator");
-        String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine+""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
+        String s = ""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
         System.out.println(""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         if(!RandomSimulator.shouldI(losePorcent))
             host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg); 
@@ -107,21 +108,8 @@ public class GbnSendingProtocol extends GbnProtocol {
             s+="!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
         }
         nsq=0;
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-                fos = new FileOutputStream(file,true);
-            }
-            
-            fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
+        log(s);
+        
         /*
         DataMessage msg=new DataMessage("salut",0);
         System.out.println(""+applic.dudename+"  ->sending "+msg);
@@ -141,7 +129,6 @@ public class GbnSendingProtocol extends GbnProtocol {
         GbnMessage ms=(GbnMessage)datagram.getPayload();
         if(ms.getGbnMessType()=='a'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             ACK ack = (ACK) ms;
-            String newLine = System.getProperty("line.separator");
             String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
             System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             if(ack.getSeqNum()>=base){
@@ -157,21 +144,7 @@ public class GbnSendingProtocol extends GbnProtocol {
                     s+="[tDeadLine actualised to "+tDeadLine+"ms]"+newLine;
                     new0=(int) (host.getNetwork().getScheduler().getCurrentTime()*1000);
                 }
-                FileOutputStream fos = null;
-                try{
-                    File file = new File("Status.log");
-                    if(file.length()==0){
-                        fos = new FileOutputStream(file,false);
-                    }else{
-                        fos = new FileOutputStream(file,true);
-                    }
-            
-                    fos.write(s.getBytes());
-                }catch(IOException e){
-                    System.err.println(e.getMessage());
-                }finally{
-                    fos.close();
-                }
+                log(s);
                 potentiallySend();
             }
 
@@ -210,7 +183,6 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void sendOneMessage(int i) throws Exception{
         String dataToSend=((GbnSender)applic).getDataToSend(i);
         DataMessage nextMsg=new DataMessage(dataToSend,i);
-        String newLine = System.getProperty("line.separator");
         String s = ""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)";
         System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
         if(!RandomSimulator.shouldI(losePorcent)){
@@ -221,42 +193,15 @@ public class GbnSendingProtocol extends GbnProtocol {
             System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
             s+="------> !!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
         }
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-            fos = new FileOutputStream(file,true);
-            }
-            fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
+        log(s);
     }
     
     public void sendWithNoLoss(int i) throws Exception{
         String dataToSend=((GbnSender)applic).getDataToSend(i);
         DataMessage nextMsg=new DataMessage(dataToSend,i);
         System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-        String newLine = System.getProperty("line.separator");
         String s = ""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-                fos = new FileOutputStream(file,true);
-            }
-            fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
+        log(s);
         host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
     }
     
@@ -265,22 +210,8 @@ public class GbnSendingProtocol extends GbnProtocol {
     */
     public void timeOutReaction() throws Exception{
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
-        String newLine = System.getProperty("line.separator");
         String s = "<><><><><><> TIMEOUT <><><><><><>"+newLine;
-        FileOutputStream fos = null;
-        try{
-            File file = new File("Status.log");
-            if(file.length()==0){
-                fos = new FileOutputStream(file,false);
-            }else{
-                fos = new FileOutputStream(file,true);
-            }
-            fos.write(s.getBytes());
-        }catch(IOException e){
-            System.err.println(e.getMessage());
-        }finally{
-            fos.close();
-        }
+        log(s);
         if(nsq==0){
             basicSend(((GbnSender)applic).getDst());
         }
@@ -296,29 +227,23 @@ public class GbnSendingProtocol extends GbnProtocol {
         tDeadLine=(int)(tDeadLine*1.1);
         System.out.println("[tDeadLine actualised to "+tDeadLine+"ms]");
         s="[tDeadLine actualised to "+tDeadLine+"ms]"+newLine;
-        if(tDeadLine>5000){
-            /*
-            s+="Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore"+newLine+"Network appears to be dead"+newLine+"---------------------------------------";
-            try{
-                File file = new File("Status.log");
-                if(file.length()==0){
-                    fos = new FileOutputStream(file,false);
-                }else{
-                    fos = new FileOutputStream(file,true);
-                }
-                fos.write(s.getBytes());
-            }catch(IOException e){
-                System.err.println(e.getMessage());
-            }finally{
-                fos.close();
-            }*/
+        if(tDeadLine>5000){            
+            s+="Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore"+newLine+"Network appears to be dead"+newLine+"---------------------------------------";            
             System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore");
             throw new Exception("Network appears to be dead");
         }        
         
-        tim.ScheduleTimeOut(tDeadLine);
-        
-        /*try{
+        tim.ScheduleTimeOut(tDeadLine);       
+        log(s);
+    }
+    
+    /**
+     * Method to write our log in "Status.log"
+     * @param s String to write
+     */
+    public void log(String s){
+        FileOutputStream fos = null;
+        try{
             File file = new File("Status.log");
             if(file.length()==0){
                 fos = new FileOutputStream(file,false);
@@ -329,11 +254,12 @@ public class GbnSendingProtocol extends GbnProtocol {
         }catch(IOException e){
             System.err.println(e.getMessage());
         }finally{
-            fos.close();
-        }*/
-        
-        
-        
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                 Logger.getLogger(GbnSendingProtocol.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     /**

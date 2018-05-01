@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static reso.examples.gobackn.GbnSendingProtocol.IP_PROTO_SENDING_GBN;
 import reso.ip.Datagram;
 import reso.ip.IPAddress;
@@ -24,7 +26,7 @@ public class GbnReceivingProtocol extends GbnProtocol{
     public static final int IP_PROTO_RECEIVING_GBN= Datagram.allocateProtocolNumber("RECEIVING-GO-BACK-N");
     private int seqNum;
     
-    
+    public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     
     
     public GbnReceivingProtocol(GbnReceiver receiver, IPHost host) {
@@ -59,7 +61,6 @@ public class GbnReceivingProtocol extends GbnProtocol{
         if(ms.getGbnMessType()=='m'){       //Sinon il y a eu une erreur et le message ne concerne pas ce protocol. Cela ne devrait cependant jamais arriver grace au IP_PROTO_...
             DataMessage msg= (DataMessage) ms;
             System.out.println(""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-            String newLine = System.getProperty("line.separator");
             String s = ""+applic.dudename+"  Message n°"+msg.getSeqNum()+" received. Data= "+msg.getData();
             if(msg.getSeqNum()==seqNum){
                 System.out.println(""+applic.dudename+"  ->sending ACK("+seqNum+")"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
@@ -82,20 +83,32 @@ public class GbnReceivingProtocol extends GbnProtocol{
                     s+="!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
                 }
             }
-            FileOutputStream fos = null;
-                try{
-                    File file = new File("Status.log");
-                if(file.length()==0){
-                    fos = new FileOutputStream(file,false);
-                }else{
-                    fos = new FileOutputStream(file,true);
-                }
-                fos.write(s.getBytes());
-                }catch(IOException e){
-                    System.err.println(e.getMessage());
-                }finally{
-                    fos.close();
-                }
+            log(s);
+           
+        }
+    }
+    /**
+     * Method to write all the data in our file "Status.log"
+     * @param s 
+     */
+    public void log(String s){
+        FileOutputStream fos = null;
+        try{
+            File file = new File("Status.log");
+        if(file.length()==0){
+            fos = new FileOutputStream(file,false);
+        }else{
+            fos = new FileOutputStream(file,true);
+        }
+        fos.write(s.getBytes());
+        }catch(IOException e){
+            System.err.println(e.getMessage());
+        }finally{
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GbnReceivingProtocol.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

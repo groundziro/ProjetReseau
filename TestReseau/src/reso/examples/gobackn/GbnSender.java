@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
 import reso.ip.IPLayer;
@@ -19,6 +21,7 @@ import reso.ip.IPLayer;
  * @author Alfatta
  */
 public class GbnSender extends GbnApplication{
+    public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     private final IPLayer ip;
     private final IPAddress dst;  //Supposant ici qu'on communiquera tout le temps avec le même Node
     public ArrayList<String> sendingQueue;
@@ -44,7 +47,13 @@ public class GbnSender extends GbnApplication{
     
     @Override
     public void start() throws Exception {
+        File file = new File("Status.log");
+        if(file.exists())
+            file.delete();
+        file.createNewFile();
+        String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine;
         GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP);
+        log(s);
         ip.addListener(GbnSendingProtocol.IP_PROTO_SENDING_GBN, prot);
         prot.basicSend(dst);
     }
@@ -53,7 +62,30 @@ public class GbnSender extends GbnApplication{
     public void stop() {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+/**
+     * Method to write our log in "Status.log"
+     * @param s String to write
+     */
+    public void log(String s){
+        FileOutputStream fos = null;
+        try{
+            File file = new File("Status.log");
+            if(file.length()==0){
+                fos = new FileOutputStream(file,false);
+            }else{
+                fos = new FileOutputStream(file,true);
+            }
+            fos.write(s.getBytes());
+        }catch(IOException e){
+            System.err.println(e.getMessage());
+        }finally{
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                 Logger.getLogger(GbnSendingProtocol.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     
     
