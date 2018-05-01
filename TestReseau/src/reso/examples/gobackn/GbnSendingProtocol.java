@@ -211,6 +211,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void timeOutReaction() throws Exception{
         if(base==((GbnSender)applic).sendingQueue.size()){
             System.out.println("WORK IS DONE");
+            log("WORK IS DONE");
             return;
         }
         

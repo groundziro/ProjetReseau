@@ -16,7 +16,7 @@ import reso.utilities.NetworkBuilder;
  *
  * @author Alfatta
  */
-public class BackNMain {
+public class Demo {
 
     //private static final boolean ENABLE_SNIFFER= false;
     
