@@ -349,6 +349,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         current+=(double)1/newN; 
         update();
     }
+    
     /**
      * Example of multiplicative decrease.
      */
