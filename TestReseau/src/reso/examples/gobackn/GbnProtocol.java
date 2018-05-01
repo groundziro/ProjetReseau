@@ -79,6 +79,10 @@ public abstract class GbnProtocol implements IPInterfaceListener {
     public int getLosePorcent() {
         return losePorcent;
     }
+
+    public IPHost getHost() {
+        return host;
+    }
     
     
     

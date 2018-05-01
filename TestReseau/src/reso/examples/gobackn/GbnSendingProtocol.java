@@ -9,11 +9,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import reso.common.AbstractTimer;
 import static reso.examples.gobackn.GbnReceivingProtocol.IP_PROTO_RECEIVING_GBN;
 import reso.ip.Datagram;
 import reso.ip.IPAddress;
 import reso.ip.IPHost;
 import reso.ip.IPInterfaceAdapter;
+import reso.scheduler.AbstractScheduler;
+import reso.scheduler.Scheduler;
 
 /**
  *
@@ -24,7 +27,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     
  
     
-    private MyTimer tim;
+    private GbnTimer tim;
     
     private int w;                   //the seqNum focused by the timer
     private int new0;                //time, according to the scheduler, of the last ACK received that concerns the update of tDeadLine
@@ -38,13 +41,15 @@ public class GbnSendingProtocol extends GbnProtocol {
     private double current; //current size of the window for additive increase. N will be modified only if (int) current > N.
     private int ssthresh; //threshold of the slow start.
     
+
+    
     public GbnSendingProtocol(GbnSender sender, IPHost host) {
         super(sender, host);
         nsq=-1;
         base=-1;
         N=8;
         tDeadLine=300;
-        tim=new MyTimer(this);
+        tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         losePorcent=0;
     }
@@ -55,7 +60,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         base=-1;
         N=8;
         tDeadLine=300;
-        tim=new MyTimer(this);
+        tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         this.losePorcent=losePorcent;
     }
@@ -66,7 +71,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         base=-1;
         N=8;
         tDeadLine=500;
-        tim=new MyTimer(this);
+        tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         losePorcent=0;
     }
@@ -77,7 +82,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         base=-1;
         N=8;
         tDeadLine=500;
-        tim=new MyTimer(this);
+        tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         this.losePorcent=losePorcent;
     }
@@ -90,8 +95,7 @@ public class GbnSendingProtocol extends GbnProtocol {
      * @throws Exception
      */
     public void basicSend(IPAddress dst) throws Exception{
-        tim.schedule(tDeadLine);
-        
+        tim.ScheduleTimeOut(tDeadLine);
         DataMessage nextMsg=new DataMessage("coucou",-1);
         String newLine = System.getProperty("line.separator");
         String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine+""+applic.dudename+"  ->sending BASIC "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
@@ -177,7 +181,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void potentiallySend() throws Exception{
         if(nsq < ((GbnSender)applic).sendingQueue.size()){
             if(nsq<(base+N)){
-                /*
+                
                 String dataToSend=((GbnSender)applic).getDataToSend(nsq);
                 DataMessage nextMsg=new DataMessage(dataToSend,nsq);
                 System.out.println(""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
@@ -185,22 +189,21 @@ public class GbnSendingProtocol extends GbnProtocol {
                     host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
                 else
                     System.out.println("!!<-- PACKAGE LOSE SIMULATED -->!!");
-                */
-                sendOneMessage(nsq);
+                
+                //sendOneMessage(nsq);
                 
                 //if(nsq==base)
                 if(!tim.inProgress){
-                    //System.out.println("yoyo");
-                    tim.schedule(tDeadLine);
+                    tim.ScheduleTimeOut(tDeadLine);
                     w=nsq;
                 }
+       
                 nsq++;
                 potentiallySend();
             }
         }
-        else{
-            tim.cancel();
-            tim.terminate();   //Work is done. We can shut down the timer (optionnal)
+        else{            //Work is done
+         //   tim.cancel();
         }
     }
     
@@ -283,18 +286,18 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
         else{          
             for(int j=base;j<nsq;j++){
-                sendOneMessage(j);
-                //sendWithNoLoss(j);
+                //sendOneMessage(j);
+                sendWithNoLoss(j);
             }
         }
 
         tim.cancel();
         
-        tDeadLine=(int)(tDeadLine*1.5);
+        tDeadLine=(int)(tDeadLine*1.1);
         System.out.println("[tDeadLine actualised to "+tDeadLine+"ms]");
         s="[tDeadLine actualised to "+tDeadLine+"ms]"+newLine;
         if(tDeadLine>5000){
-            System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore");
+            /*
             s+="Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore"+newLine+"Network appears to be dead"+newLine+"---------------------------------------";
             try{
                 File file = new File("Status.log");
@@ -308,9 +311,13 @@ public class GbnSendingProtocol extends GbnProtocol {
                 System.err.println(e.getMessage());
             }finally{
                 fos.close();
-            }
+            }*/
+            System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore");
             throw new Exception("Network appears to be dead");
         }        
+        
+        tim.ScheduleTimeOut(tDeadLine);
+        
         /*try{
             File file = new File("Status.log");
             if(file.length()==0){
@@ -324,9 +331,11 @@ public class GbnSendingProtocol extends GbnProtocol {
         }finally{
             fos.close();
         }*/
-        //tim.schedule(tDeadLine);
+        
+        
         
     }
+    
     /**
      * That's for an example of additive increase so not definitive.
      */

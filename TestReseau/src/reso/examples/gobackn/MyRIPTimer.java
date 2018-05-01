@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * @author Thomas
  */
-public class MyTimer extends Timer{
+public class MyRIPTimer extends Timer{
     public boolean inProgress;
     TimerTask theTask;
     int time;
@@ -23,7 +23,7 @@ public class MyTimer extends Timer{
      * Constructor classic.
      * @param protocol 
      */
-   public MyTimer(GbnSendingProtocol protocol){
+   public MyRIPTimer(GbnSendingProtocol protocol){
         prot = protocol;
         inProgress=false;
     }
@@ -31,7 +31,7 @@ public class MyTimer extends Timer{
      * Constructor for debug essentially
      * @param time time for the scheduled task
      */
-    public MyTimer(int time){
+    public MyRIPTimer(int time){
         prot = null;
         inProgress=false;
         schedule(time);
@@ -53,7 +53,7 @@ public class MyTimer extends Timer{
                 try {
                     WorkToDo(this);
                 } catch (Exception ex) {
-                    Logger.getLogger(MyTimer.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MyRIPTimer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
