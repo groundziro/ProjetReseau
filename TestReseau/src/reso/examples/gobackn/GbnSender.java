@@ -54,6 +54,10 @@ public class GbnSender extends GbnApplication{
         String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine;
         GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP);
         log(s);
+        File file1 = new File("Plot.log");
+        if(file1.exists())
+            file1.delete();
+        file1.createNewFile();
         ip.addListener(GbnSendingProtocol.IP_PROTO_SENDING_GBN, prot);
         prot.basicSend(dst);
     }

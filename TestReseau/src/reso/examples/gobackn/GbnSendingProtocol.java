@@ -29,6 +29,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     
+    //private int duplicate;
     private GbnTimer tim;
     
     private int w;                   //the seqNum focused by the timer
@@ -137,6 +138,7 @@ public class GbnSendingProtocol extends GbnProtocol {
 
                 if(ack.getSeqNum()==w){ //Actualising the value of tDeadLine
                     tim.cancel();
+                    //slowStart();
                     int timeTaken=(int)(host.getNetwork().getScheduler().getCurrentTime()*1000) - new0;
                     timeTaken=(int)(timeTaken*2.5);
                     tDeadLine=(tDeadLine+timeTaken)/2;
@@ -217,7 +219,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             log("WORK IS DONE");
             return;
         }
-        
+        //N=1;
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         String s = "<><><><><><> TIMEOUT <><><><><><>"+newLine;
         log(s);
@@ -239,6 +241,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         if(tDeadLine>5000){            
             s+="Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore"+newLine+"Network appears to be dead"+newLine+"---------------------------------------";            
             System.out.println("Current value of tDeadLine:"+tDeadLine+".  We can assume that the does not works anymore");
+            log(s);
             throw new Exception("Network appears to be dead");
         }        
         
@@ -270,13 +273,36 @@ public class GbnSendingProtocol extends GbnProtocol {
             }
         }
     }
-    
+    /**
+     * Will write the size of the window at a time t in the file "Plot.log"
+     * Use of a timer or write only when there's modification?
+     */
+    public void plot(){
+        String s = "("+(int) (host.getNetwork().getScheduler().getCurrentTime()*1000)+") Size window = "+N+newLine;
+        FileOutputStream fos = null;
+        try{
+            File file = new File("Plot.log");
+            if(file.length()==0){
+                fos = new FileOutputStream(file,false);
+            }else{
+                fos = new FileOutputStream(file,true);
+            }
+            fos.write(s.getBytes());
+        }catch(IOException e){
+            System.err.println(e.getMessage());
+        }finally{
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                 Logger.getLogger(GbnSendingProtocol.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
     /**
      * That's for an example of additive increase so not definitive.
      */
     public void additive(){
-        int newN = N;
-        current+=(double)1/newN; 
+        current+=(double)1/N; 
         update();
     }
     
@@ -284,24 +310,29 @@ public class GbnSendingProtocol extends GbnProtocol {
      * Example of multiplicative decrease.
      */
     public void multiplicative(){
-        int newN = N;
-        newN/=2;
-        current = newN;
+        N/=2;
+        current = N;
     }
+    
+    
     /**
      * Example of slow start.
      */
     public void slowStart(){
-        int newN = N;
-        if(newN > ssthresh)
-            newN++;
+        if(N < ssthresh){
+            N++;
+            plot();
+        }
+        else
+            additive();
     }
     /**
      * Updates the value of N.
      */
     public void update(){
-        int newN = N;
-        if((int) current > newN)
-            newN=(int) current;
+        if((int) current > N){
+            N=(int) current;
+            plot();
+        }
     }
 }

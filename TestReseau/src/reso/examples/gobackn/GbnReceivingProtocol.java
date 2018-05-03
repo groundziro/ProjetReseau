@@ -8,7 +8,6 @@ package reso.examples.gobackn;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static reso.examples.gobackn.GbnSendingProtocol.IP_PROTO_SENDING_GBN;
