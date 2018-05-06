@@ -30,6 +30,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     
     private int duplicate;
+    private int seqNumDuplicate = -2;
     private GbnTimer tim;
     
     private final boolean useCongestion; //Determines if we're using the Congestion Avoidance or not.
@@ -167,12 +168,21 @@ public class GbnSendingProtocol extends GbnProtocol {
                 potentiallySend();
             }else{
                 if(useCongestion){
-                    duplicate++;
-                    if(duplicate == 3){
-                        multiplicative();
-                        duplicate = 0;
-                        System.out.println("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
-                        log("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine);
+                    System.out.println("Duplicate"+ack.getSeqNum());
+                    if(seqNumDuplicate==-2){
+                        
+                        seqNumDuplicate=ack.getSeqNum();
+                    }else{
+                        if(ack.getSeqNum()==seqNumDuplicate){
+                            duplicate++;
+                            if(duplicate == 3){
+                                multiplicative();
+                                seqNumDuplicate=-2;
+                                duplicate = 0;
+                                System.out.println("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+                                log("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine);
+                            }
+                        }
                     }
                 }
             }
@@ -247,7 +257,12 @@ public class GbnSendingProtocol extends GbnProtocol {
             return;
         }
         if(useCongestion){
+            if(N>1)
+                ssthresh=N/2;
+            else
+                ssthresh=1;
             N=1;
+            nsq=base+1;
             plot();
         }
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
@@ -337,7 +352,10 @@ public class GbnSendingProtocol extends GbnProtocol {
      */
     public void additive(){
         current+=(double)1/N; 
-        update();
+        if((int) current > N){
+            N=(int) current;
+            plot();
+        }
     }
     
     /**
@@ -361,14 +379,5 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
         else
             additive();
-    }
-    /**
-     * Updates the value of N.
-     */
-    public void update(){
-        if((int) current > N){
-            N=(int) current;
-            plot();
-        }        
     }
 }
