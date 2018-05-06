@@ -29,9 +29,10 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     
-    //private int duplicate;
+    private int duplicate;
     private GbnTimer tim;
     
+    private boolean useCongestion; //Determines if we're using the Congestion Avoidance or not.
     private int w;                   //the seqNum focused by the timer
     private int new0;                //time, according to the scheduler, of the last ACK received that concerns the update of tDeadLine
     
@@ -42,37 +43,40 @@ public class GbnSendingProtocol extends GbnProtocol {
     private int tDeadLine;   //how much time (in ms) the timer will wait an ACK befaure considering the corresponding message as a loss
     
     private double current; //current size of the window for additive increase. N will be modified only if (int) current > N.
-    private int ssthresh; //threshold of the slow start.
+    private int ssthresh = 8; //threshold of the slow start.
     
 
     
-    public GbnSendingProtocol(GbnSender sender, IPHost host) {
+    public GbnSendingProtocol(GbnSender sender, IPHost host, boolean congestion) {
         super(sender, host);
+        useCongestion = congestion;
         nsq=-1;
         base=-1;
-        N=8;
+        N=1;
         tDeadLine=300;
         tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         losePorcent=0;
     }
     
-    public GbnSendingProtocol(GbnSender sender, IPHost host, int losePorcent) {
+    public GbnSendingProtocol(GbnSender sender, IPHost host, int losePorcent, boolean congestion) {
         super(sender, host);
+        useCongestion = congestion;
         nsq=-1;
         base=-1;
-        N=8;
+        N=1;
         tDeadLine=300;
         tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
         this.losePorcent=losePorcent;
     }
 
-    public GbnSendingProtocol(GbnSender sender) {
+    public GbnSendingProtocol(GbnSender sender, boolean congestion) {
         super(sender);
+        useCongestion = congestion;
         nsq=-1;
         base=-1;
-        N=8;
+        N=1;
         tDeadLine=500;
         tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
@@ -83,7 +87,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         super(sender);
         nsq=-1;
         base=-1;
-        N=8;
+        N=1;
         tDeadLine=500;
         tim=new GbnTimer((Scheduler)host.getNetwork().getScheduler(),this);
         w=-1; new0=0;
@@ -135,10 +139,9 @@ public class GbnSendingProtocol extends GbnProtocol {
             if(ack.getSeqNum()>=base){
 
                 base=ack.getSeqNum()+1;
-
+                slowStart();
                 if(ack.getSeqNum()==w){ //Actualising the value of tDeadLine
                     tim.cancel();
-                    //slowStart();
                     int timeTaken=(int)(host.getNetwork().getScheduler().getCurrentTime()*1000) - new0;
                     timeTaken=(int)(timeTaken*2.5);
                     tDeadLine=(tDeadLine+timeTaken)/2;
@@ -148,6 +151,14 @@ public class GbnSendingProtocol extends GbnProtocol {
                 }
                 log(s);
                 potentiallySend();
+            }else{
+                duplicate++;
+                if(duplicate == 3){
+                    multiplicative();
+                    duplicate = 0;
+                    System.out.println("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
+                    log("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine);
+                }
             }
 
         }
@@ -219,7 +230,8 @@ public class GbnSendingProtocol extends GbnProtocol {
             log("WORK IS DONE");
             return;
         }
-        //N=1;
+        N=1;
+        plot();
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
         String s = "<><><><><><> TIMEOUT <><><><><><>"+newLine;
         log(s);
@@ -312,6 +324,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     public void multiplicative(){
         N/=2;
         current = N;
+        plot();
     }
     
     
@@ -333,6 +346,6 @@ public class GbnSendingProtocol extends GbnProtocol {
         if((int) current > N){
             N=(int) current;
             plot();
-        }
+        }        
     }
 }
