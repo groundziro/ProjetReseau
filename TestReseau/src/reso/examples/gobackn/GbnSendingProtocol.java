@@ -170,8 +170,8 @@ public class GbnSendingProtocol extends GbnProtocol {
                 if(useCongestion){
                     System.out.println("Duplicate"+ack.getSeqNum());
                     if(seqNumDuplicate==-2){
-                        
                         seqNumDuplicate=ack.getSeqNum();
+                        duplicate++;
                     }else{
                         if(ack.getSeqNum()==seqNumDuplicate){
                             duplicate++;
