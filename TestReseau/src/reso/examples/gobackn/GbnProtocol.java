@@ -49,8 +49,8 @@ public abstract class GbnProtocol implements IPInterfaceListener {
     static GbnSendingProtocol makeProtocol(GbnSender sender, boolean congestion){
         return new GbnSendingProtocol(sender,congestion);
     }
-    static GbnSendingProtocol makeProtocol(GbnSender sender, int losP){
-        return new GbnSendingProtocol(sender,losP);
+    static GbnSendingProtocol makeProtocol(GbnSender sender, int losP, boolean congestion){
+        return new GbnSendingProtocol(sender,losP,congestion);
     }
     
     public GbnProtocol(GbnApplication applic, IPHost host) {
