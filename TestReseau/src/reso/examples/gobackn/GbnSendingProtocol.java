@@ -246,7 +246,7 @@ public class GbnSendingProtocol extends GbnProtocol {
         String s = ""+applic.dudename+"  ->sending "+nextMsg+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
         log(s);
         host.getIPLayer().send(IPAddress.ANY, ((GbnSender)applic).getDst(), IP_PROTO_RECEIVING_GBN, nextMsg);
-        System.out.println("End Timeout");
+        //System.out.println("End Timeout");
         nsq++;
     }
     
