@@ -38,7 +38,11 @@ public class Demo {
                 if (ENABLE_SNIFFER)
     			host1.addApplication(new AppSniffer(host1, new String [] {"eth0"}));
                 */
+                
+                
                 AbstractApplication sender = new GbnSender(host1, IP_ADDR2, false);
+                //AbstractApplication sender = new GbnSender(host1, IP_ADDR2, true);
+                
                 ((GbnSender)sender).dudename="sen0";
     		//sender.addToSendingQueue("1");
                 host1.addApplication(sender);

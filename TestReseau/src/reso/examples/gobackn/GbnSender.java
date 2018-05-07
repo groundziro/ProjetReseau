@@ -25,12 +25,22 @@ public class GbnSender extends GbnApplication{
     private final IPLayer ip;
     private final IPAddress dst;  //Supposant ici qu'on communiquera tout le temps avec le même Node
     public ArrayList<String> sendingQueue;
+    public boolean manageCongestion;
 
-    public GbnSender(IPHost host, IPAddress dst, boolean makeLose) {	
+    public GbnSender(IPHost host, IPAddress dst) {	
     	super(host, "sender");
     	this.dst= dst;
     	ip= host.getIPLayer();
         sendingQueue=new ArrayList<String>();
+        manageCongestion=false;
+    }
+    
+    public GbnSender(IPHost host, IPAddress dst, boolean manageCongestion) {	
+    	super(host, "sender");
+    	this.dst= dst;
+    	ip= host.getIPLayer();
+        sendingQueue=new ArrayList<String>();
+        this.manageCongestion=manageCongestion;
     }
 
     public IPAddress getDst() {
@@ -52,8 +62,9 @@ public class GbnSender extends GbnApplication{
             file.delete();
         file.createNewFile();
         String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine;
-        GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,true);
+        //GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,true);
         //GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,false);
+        GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,manageCongestion);
         log(s);
         File file1 = new File("Plot.log");
         if(file1.exists())
