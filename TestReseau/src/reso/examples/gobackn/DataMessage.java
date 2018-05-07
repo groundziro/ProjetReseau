@@ -8,8 +8,8 @@ package reso.examples.gobackn;
 import reso.common.Message;
 
 /**
- *
- * @author Alfatta
+ * Message containing datas (and a seqNum), send by the sender to the receiver. 
+ * 
  */
 public class DataMessage extends GbnMessage{
 

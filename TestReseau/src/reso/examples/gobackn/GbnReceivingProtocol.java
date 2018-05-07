@@ -18,7 +18,6 @@ import reso.ip.IPInterfaceAdapter;
 
 /**
  * Receive data and send back ACK
- * @author Alfatta
  */
 public class GbnReceivingProtocol extends GbnProtocol{
     

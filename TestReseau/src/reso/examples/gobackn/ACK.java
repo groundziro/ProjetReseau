@@ -8,8 +8,7 @@ package reso.examples.gobackn;
 import reso.common.Message;
 
 /**
- *
- * @author Alfatta
+ * Message send by the receiver. Only contains the seqNum of the last message consecutive received
  */
 public class ACK extends GbnMessage{
     	

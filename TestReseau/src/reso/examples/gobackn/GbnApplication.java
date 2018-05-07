@@ -9,8 +9,8 @@ import reso.common.AbstractApplication;
 import reso.common.Host;
 
 /**
- *
- * @author Alfatta
+ * The applications the Nodes use with go-back-n
+ * GbnSender and GbnReceiver are GbnApplications
  */
 public abstract class GbnApplication extends AbstractApplication{
     

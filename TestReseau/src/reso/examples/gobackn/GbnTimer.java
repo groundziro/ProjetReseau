@@ -34,11 +34,15 @@ public class GbnTimer{
         inProgress=false;
     }
     
+    /**
+     * Create an event that will call timeOutReaction in the GbnSendingProtocol after interval ms
+     * @param interval the time before the timeOutReaction call, in ms
+     */
     public void ScheduleTimeOut(int interval){
         double interv=(double)interval/1000;
         
         if(tmp!=null)
-            tmp.stop(); //On stop l'InnerTimer et on le jette (remplace par un autre)
+            tmp.stop(); //We stop the InnerTimer and throw it (replace it with another)
         tmp=new InnerTimer(this,sch,interv);
         tmp.start();
         inProgress=true;
@@ -48,7 +52,6 @@ public class GbnTimer{
         if(tmp!=null)
             tmp.stop();
         inProgress=false;
-       // System.out.println("CANCELLED");
     }
 
     
@@ -60,7 +63,6 @@ public class GbnTimer{
                 this.outer=outer;
     	}
     	protected void run() throws Exception {
-			//System.out.println("OYOYOYOYOYOYOYO " + scheduler.getCurrentTime()*1000 + " OYOYOYOYOYOYOYO");
                         outer.inProgress=false;
                         prot.timeOutReaction();	
 		}

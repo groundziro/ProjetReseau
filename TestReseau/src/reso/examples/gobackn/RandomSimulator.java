@@ -20,7 +20,7 @@ public class RandomSimulator {
     /**
      * Have porc% of chance to return true, and (100-porc)% of chance to return false
      * @param porc
-     * @return
+     * @return true if we should lose the message, false if the sending process should be OK
      */
     public static boolean shouldI(int porc){
         if(porc==0)

@@ -17,13 +17,12 @@ import reso.ip.IPHost;
 import reso.ip.IPLayer;
 
 /**
- *
- * @author Alfatta
+ * The GbnApplication sending datas (of the sendingQueue)
  */
 public class GbnSender extends GbnApplication{
     public final String newLine = System.getProperty("line.separator"); //Character for '\n'
     private final IPLayer ip;
-    private final IPAddress dst;  //Supposant ici qu'on communiquera tout le temps avec le même Node
+    private final IPAddress dst;  //Assuming we will always communicate with only one Node
     public ArrayList<String> sendingQueue;
     public boolean manageCongestion;
 

@@ -19,8 +19,9 @@ import reso.ip.IPInterfaceAdapter;
 import reso.ip.IPInterfaceListener;
 
 /**
- *
- * @author Alfatta
+ * InterfaceListeners used with go-back-n
+ * GbnSendingProtocols and GbnReceivingProtocols are GbnProtocols
+ * Go-back-n need a Node using a GbnSendingProtocol and a node using a GbnReceivingProtocol in order to function
  */
 public abstract class GbnProtocol implements IPInterfaceListener {
     

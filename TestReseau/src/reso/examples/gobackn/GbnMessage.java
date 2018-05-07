@@ -8,8 +8,8 @@ package reso.examples.gobackn;
 import reso.common.Message;
 
 /**
- *
- * @author Alfatta
+ * Messages used with go-back-n
+ * ACKs and DataMessages are GbnMessages
  */
 public abstract class GbnMessage implements Message{
     public final int seqNum;

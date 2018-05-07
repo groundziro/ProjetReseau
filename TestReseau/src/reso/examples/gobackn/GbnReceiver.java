@@ -11,8 +11,8 @@ import reso.ip.IPHost;
 import reso.ip.IPLayer;
 
 /**
- *
- * @author Alfatta
+ * The receiving GbnApplication.
+ * Receive messages and send back ACKs
  */
 public class GbnReceiver extends GbnApplication{
 

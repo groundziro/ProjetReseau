@@ -21,8 +21,8 @@ import reso.scheduler.AbstractScheduler;
 import reso.scheduler.Scheduler;
 
 /**
- *
- * @author Alfatta
+ * The GbnProtocol managing the sending process of go-back-n, including the pipelining and potentially the congestion control (if useConqestion is true)
+ * The send datas are the one of the corresponding host
  */
 public class GbnSendingProtocol extends GbnProtocol {
     public static final int IP_PROTO_SENDING_GBN= Datagram.allocateProtocolNumber("SENDING-GO-BACK-N");
@@ -129,16 +129,10 @@ public class GbnSendingProtocol extends GbnProtocol {
         nsq=0;
         log(s);
         
-        /*
-        DataMessage msg=new DataMessage("salut",0);
-        System.out.println(""+applic.dudename+"  ->sending "+msg);
-        
-        potentiallySend();
-        */
     }
     
     /**
-     * Receive an ACK and manage related operations (adapt the window, send a new message)
+     * Receive an ACK and manage related operations (adapt the window, send a new message,...)
      * @param src
      * @param datagram
      * @throws Exception
@@ -155,7 +149,7 @@ public class GbnSendingProtocol extends GbnProtocol {
                 duplicate=0;
                 base=ack.getSeqNum()+1;
                 if(useCongestion)
-                    slowStart();
+                    uppgradeWindow();
                 if(ack.getSeqNum()==w){ //Actualising the value of tDeadLine
                     tim.cancel();
                     int timeTaken=(int)(host.getNetwork().getScheduler().getCurrentTime()*1000) - new0;
@@ -191,6 +185,11 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
     }
 
+    /**
+     * Check if we can send an another message (without exceeding of the window size).
+     * If yes then actually send the message, and manage the corresponding information concerning the Timer
+     * @throws Exception
+     */
     public void potentiallySend() throws Exception{
         if(nsq < ((GbnSender)applic).sendingQueue.size()){
             if(nsq<(base+N)){
@@ -206,9 +205,7 @@ public class GbnSendingProtocol extends GbnProtocol {
                     s+="!!<-- PACKAGE LOSE SIMULATED -->!!"+newLine;
                 }
                 log(s);
-                //sendOneMessage(nsq);
                 
-                //if(nsq==base)
                 if(!tim.inProgress){
                     tim.ScheduleTimeOut(tDeadLine);
                     w=nsq;
@@ -222,7 +219,12 @@ public class GbnSendingProtocol extends GbnProtocol {
             tim.ScheduleTimeOut(tDeadLine);  //Last timer to check if everything is done
         }
     }
-    
+
+    /**
+     * Simply send the package n° i
+     * @param i
+     * @throws Exception
+     */
     public void sendOneMessage(int i) throws Exception{
         String dataToSend=((GbnSender)applic).getDataToSend(i);
         DataMessage nextMsg=new DataMessage(dataToSend,i);
@@ -239,6 +241,13 @@ public class GbnSendingProtocol extends GbnProtocol {
         log(s);
     }
     
+    /**
+     * Send the message n°i, but unlike sendOneMessage(int i), it CAN'T lose the message
+     * Note that this method is never needed, go-back-n could work without it.
+     * We just use it in the timeOut to get clear results
+     * @param i
+     * @throws Exception
+     */
     public void sendWithNoLoss(int i) throws Exception{
         String dataToSend=((GbnSender)applic).getDataToSend(i);
         DataMessage nextMsg=new DataMessage(dataToSend,i);
@@ -253,7 +262,8 @@ public class GbnSendingProtocol extends GbnProtocol {
     }
     
     /**
-    * Called after a timeout. Resent potentially lost messages
+    * Called after a timeout. 
+    * Resend potentially lost messages and, if the congestion control is activated, manage the related informations
     */
     public void timeOutReaction() throws Exception{
         if(base==((GbnSender)applic).sendingQueue.size()){
@@ -280,11 +290,10 @@ public class GbnSendingProtocol extends GbnProtocol {
         }
         else{
             if(useCongestion){
-                sendWithNoLoss(nsq);
+                sendWithNoLoss(nsq);  //We could also use sendOneMessage(nsq)
             }else{
                 for(int j=base;j<nsq;j++){
-                    //sendOneMessage(j);
-                    sendWithNoLoss(j);
+                    sendWithNoLoss(j); //We could also use sendOneMessage(j)
                 }
             }
         }
@@ -329,6 +338,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             }
         }
     }
+    
     /**
      * Will write the size of the window at a time t in the file "Plot.log"
      * Use of a timer or write only when there's modification?
@@ -354,8 +364,9 @@ public class GbnSendingProtocol extends GbnProtocol {
             }
         }
     }
+
     /**
-     * That's for an example of additive increase so not definitive.
+     * Additive increase
      */
     public void additive(){
         current+=(double)1/N; 
@@ -366,7 +377,7 @@ public class GbnSendingProtocol extends GbnProtocol {
     }
     
     /**
-     * Example of multiplicative decrease.
+     * Multiplicative decrease.
      */
     public void multiplicative(){
         System.out.println("old ssthresh = "+ssthresh);
@@ -383,15 +394,16 @@ public class GbnSendingProtocol extends GbnProtocol {
     
     
     /**
-     * Example of slow start.
+     * Check if the window should grow the 'slow start way' or the 'additive increase way'
+     * And make the window actually grow the corresponding way
      */
-    public void slowStart(){
-        if(N < ssthresh){
+    public void uppgradeWindow(){
+        if(N < ssthresh){   //SLOW START CASE
             N++;
             current++;
             plot();
         }
-        else
+        else                //ADDITIVE INCREASE CASE
             additive();
     }
 }

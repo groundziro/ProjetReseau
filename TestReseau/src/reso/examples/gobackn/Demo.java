@@ -18,7 +18,6 @@ import reso.utilities.NetworkBuilder;
  */
 public class Demo {
 
-    //private static final boolean ENABLE_SNIFFER= false;
     
     /**
      * @param args the command line arguments
@@ -34,19 +33,17 @@ public class Demo {
 
     		IPHost host1= NetworkBuilder.createHost(network, "H1", IP_ADDR1, MAC_ADDR1);
     		host1.getIPLayer().addRoute(IP_ADDR2, "eth0");
-    		/*
-                if (ENABLE_SNIFFER)
-    			host1.addApplication(new AppSniffer(host1, new String [] {"eth0"}));
-                */
+
                 
                 
                 AbstractApplication sender = new GbnSender(host1, IP_ADDR2, false);
                 //AbstractApplication sender = new GbnSender(host1, IP_ADDR2, true);
                 
                 ((GbnSender)sender).dudename="sen0";
-    		//sender.addToSendingQueue("1");
+
                 host1.addApplication(sender);
-                //sender.addToSendingQueue("2");
+
+                
                 for(int i=0;i<80;i++){      //PLEIN DE PACKAGES A ENVOYER
                     ((GbnSender)sender).addToSendingQueue("<data_n°"+String.valueOf(i)+">");
                 }
@@ -66,7 +63,7 @@ public class Demo {
 
                 
                 RandomSimulator.receivingLosP=0;
-                RandomSimulator.sendingLosP=5;       //Each package send has 3% chance to be lost
+                RandomSimulator.sendingLosP=5;       //Each package send has 5% chance to be lost
                 
     		host1.start();
     		host2.start();
