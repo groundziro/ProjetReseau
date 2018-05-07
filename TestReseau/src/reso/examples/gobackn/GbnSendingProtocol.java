@@ -262,7 +262,7 @@ public class GbnSendingProtocol extends GbnProtocol {
             else
                 ssthresh=1;
             N=1;
-            nsq=base+1;
+            nsq=base;
             plot();
         }
         System.out.println("<><><><><><> TIMEOUT <><><><><><>");
