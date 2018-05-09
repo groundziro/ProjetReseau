@@ -1,0 +1,8 @@
+\BOOKMARK [1][-]{section.1}{Construction et ex\351cution}{}% 1
+\BOOKMARK [1][-]{section.2}{Structure de l'impl\351mentation}{}% 2
+\BOOKMARK [1][-]{section.3}{Go-Back-N \(pipelining\)}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{La "Window"}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{"Two-way handshake"}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Mise en oeuvre du Go-Back-N}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{Adaptation du temps avant time-out}{section.3}% 7
+\BOOKMARK [1][-]{section.4}{Contr\364le de congestion}{}% 8
