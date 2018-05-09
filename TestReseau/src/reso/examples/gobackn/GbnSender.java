@@ -61,8 +61,6 @@ public class GbnSender extends GbnApplication{
             file.delete();
         file.createNewFile();
         String s = "-------------------------------------"+newLine+"["+new Date(System.currentTimeMillis())+"]"+newLine+"-------------------------------------"+newLine;
-        //GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,true);
-        //GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,false);
         GbnSendingProtocol prot= GbnProtocol.makeProtocol(this, (IPHost)host, RandomSimulator.sendingLosP,manageCongestion);
         log(s);
         File file1 = new File("Plot.log");
@@ -74,10 +72,8 @@ public class GbnSender extends GbnApplication{
     }
 
     @Override
-    public void stop() {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-/**
+    public void stop() {}
+    /**
      * Method to write our log in "Status.log"
      * @param s String to write
      */

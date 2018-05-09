@@ -5,6 +5,7 @@
  */
 package reso.examples.gobackn;
 
+import java.util.Scanner;
 import reso.common.*;
 import reso.ethernet.*;
 import reso.examples.static_routing.AppSniffer;
@@ -23,6 +24,15 @@ public class Demo {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Do you wanna use congestion ? [y/n]");
+        String s = scan.next();
+        boolean congestion;
+        while(!"Y".equals(s.toUpperCase())&& !s.toUpperCase().equals("N")){
+            System.out.println("Do you want to use congestion?");
+            s = scan.next();
+        }
+        congestion = s.toUpperCase().equals("Y");
         	AbstractScheduler scheduler= new Scheduler();
 		Network network= new Network(scheduler);
     	try {
@@ -36,15 +46,16 @@ public class Demo {
 
                 
                 
-                AbstractApplication sender = new GbnSender(host1, IP_ADDR2, false);
-                //AbstractApplication sender = new GbnSender(host1, IP_ADDR2, true);
+                AbstractApplication sender = new GbnSender(host1, IP_ADDR2, congestion);
                 
                 ((GbnSender)sender).dudename="sen0";
 
                 host1.addApplication(sender);
-
+                int j = 0;
+                System.out.println("How much packets do you wanna send ?");
+                j=scan.nextInt();
                 
-                for(int i=0;i<80;i++){      //PLEIN DE PACKAGES A ENVOYER
+                for(int i=0;i<j;i++){      
                     ((GbnSender)sender).addToSendingQueue("<data_n°"+String.valueOf(i)+">");
                 }
                 

@@ -344,7 +344,8 @@ public class GbnSendingProtocol extends GbnProtocol {
      * Use of a timer or write only when there's modification?
      */
     public void plot(){
-        String s = "("+(int) (host.getNetwork().getScheduler().getCurrentTime()*1000)+") Size window = "+N+newLine;
+        String s = "("+(int) (host.getNetwork().getScheduler().getCurrentTime()*1000)+") Size window = "+N;
+        s+=" ssthresh = "+ssthresh+newLine;            
         FileOutputStream fos = null;
         try{
             File file = new File("Plot.log");
@@ -369,7 +370,7 @@ public class GbnSendingProtocol extends GbnProtocol {
      * Additive increase
      */
     public void additive(){
-        current+=(double)1/N; 
+        current+=(double)1/N;
         if((int) current > N){
             N=(int) current;
             plot();
@@ -380,14 +381,11 @@ public class GbnSendingProtocol extends GbnProtocol {
      * Multiplicative decrease.
      */
     public void multiplicative(){
-        System.out.println("old ssthresh = "+ssthresh);
         if(N>1)
             N/=2;
         else
             N=1;
         ssthresh = N;
-        current=N;
-        System.out.println("new ssthresh = "+ssthresh);
         current = N;
         plot();
     }
