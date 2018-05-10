@@ -1,4 +1,4 @@
-<project name="" default="run">
+<project name="GoBack-N" default="run">
     <target name="build">
 	<mkdir dir="build"/>
         <javac srcdir="TestReseau/src/" destdir="build" classpath="lib/junit-4.12.jar" includeantruntime="false"/>
