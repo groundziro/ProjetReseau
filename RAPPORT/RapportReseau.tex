@@ -98,7 +98,7 @@ Si en revanche un time out se produit, la valeur de tDeadLine augmente de 10\%. 
 
 
 \section{Contrôle de congestion}
-Pour le contrôle de congestion nous avons décidé de faire en sorte à ce que l'utilisateur puisse tout de suite choisir si celui-ci veut l'utiliser ou non dés le lancement de l'application. Si l'utilisateur décide de l'utiliser ce qui se passera c'est que le protocole d'envoi (\textbf{GbnSendingProtocol}) va initialiser la taille de la fenêtre \textbf{N} à 1. \\ 
+Pour le contrôle de congestion nous avons décidé de faire en sorte que l'utilisateur puisse tout de suite choisir si celui-ci veut l'utiliser ou non dés le lancement de l'application. Si l'utilisateur décide de l'utiliser ce qui se passera c'est que le protocole d'envoi (\textbf{GbnSendingProtocol}) va initialiser la taille de la fenêtre \textbf{N} à 1. \\ 
 Ensuite le programme va initier le \textit{goback-N} c'est-à-dire qu'il va lancer l'envoi de paquets avec tout d'abord une taille $N=1$ comme initialisé et lorsque notre \textbf{Sender} va recevoir le ACK correspondant au paquet envoyé il va appeler la méthode \textit{upgradeWindow()} qui va décider si l'on doit appliquer du "\textit{slow start}" ou de l'"\textit{additive increase}" en fonction de sa valeur par rapport au \textbf{ssthresh},le \textit{slow start threshold}, de la fenêtre (initalisé à la valeur $2^{32}-1$). Si notre N est strictement inférieur à \textbf{ssthresh} alors on applique la formule du \textit{slow start} qui dit : \[
 \forall \text{ACK reçu correctement, }N_{new} = N_{old}+1 MSS.
 \]\\
