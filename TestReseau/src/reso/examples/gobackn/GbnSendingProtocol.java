@@ -145,8 +145,6 @@ public class GbnSendingProtocol extends GbnProtocol {
             String s = ""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine;
             System.out.println(""+applic.dudename+"  ACK n°"+ack.getSeqNum()+" received"+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
             if(ack.getSeqNum()>=base){
-                seqNumDuplicate=-2;
-                duplicate=0;
                 base=ack.getSeqNum()+1;
                 if(useCongestion)
                     uppgradeWindow();
@@ -167,15 +165,17 @@ public class GbnSendingProtocol extends GbnProtocol {
                         seqNumDuplicate=ack.getSeqNum();
                         System.out.println("Duplicate : "+ack.getSeqNum());
                         duplicate++;
+                        
                     }else{
                         if(ack.getSeqNum()==seqNumDuplicate){
                             duplicate++;
                             if(duplicate == 3){
                                 multiplicative();
-                                seqNumDuplicate=-2;
                                 duplicate = 0;
+                                nsq=base;
                                 System.out.println("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)");
                                 log("Duplicated Ack :"+ack.getSeqNum()+ " (" + (int) (host.getNetwork().getScheduler().getCurrentTime()*1000) + "ms)"+newLine);
+                                potentiallySend();
                             }
                         }
                     }
@@ -278,6 +278,7 @@ public class GbnSendingProtocol extends GbnProtocol {
                 ssthresh=1;
             N=1;
             current=1;
+            duplicate=0;
             seqNumDuplicate=-2;
             nsq=base;
             plot();
@@ -370,7 +371,7 @@ public class GbnSendingProtocol extends GbnProtocol {
      * Additive increase
      */
     public void additive(){
-        current+=(double)1/N;
+        current+=1/(double)N;
         if((int) current > N){
             N=(int) current;
             plot();

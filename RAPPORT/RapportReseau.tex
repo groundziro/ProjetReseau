@@ -3,7 +3,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[french]{babel}
+\usepackage[francais]{babel}
 \usepackage{newunicodechar}
 
 \usepackage{graphicx}
@@ -26,7 +26,7 @@
   Implémentation de Go-Back-N et contrôle de congestion \\
   \Large Projet 1 de Réseaux I \\}
 
-\author{Groupe 5\\DACHY Corentin (131563), JOSSE Thomas (171069)}
+\author{Groupe 6\\DACHY Corentin (131563), JOSSE Thomas (171069)}
 
 \date{Année Académique : 2017 - 2018\\
 BAC 2 en Sciences Informatiques\\
@@ -41,7 +41,8 @@ Faculté des Sciences, Université de Mons}
 \newpage
 
 \section{Construction et exécution}
-Pour compiler et exécuter notre application vous pouvez soit exécuter Ant en vous plaçant dans le dossier ou se trouve le fichier \textit{build.xml} et en lançant la commande \textbf{\textit{ant}} qui va compiler et lancer la démo directement. Soit lancer le fichier \textit{reso.examples.gobackn.Demo} dans le dossier build après avoir lancé \textbf{\textit{ant build}}. A la fin de vos tests vous verrez 2 nouveaux fichiers apparaître : "Plot.log" et "Status.log". Le fichier Plot.log contiendra les infos nécessaires à la création du plot tandis que le fichier Status.log contiendra tout ce qui s'est passé lors du test comme les pertes de paquets , les envois et réceptions de ceux-ci et les time-out.
+ Pour exécuter notre démo il vous suffit de lancer le fichier \textit{reso.examples.gobackn.Demo} sans entrer de paramètres supplémentaires le fichier va vous demander intéractivement si vous voulez utiliser ou non la congestion et le nombres de paquets que vous voulez envoyer.
+ A la fin de vos tests vous verrez 2 nouveaux fichiers apparaître : "Plot.log" et "Status.log". Le fichier Plot.log contiendra les infos nécessaires à la création du plot tandis que le fichier Status.log contiendra tout ce qui s'est passé lors du test comme les pertes de paquets , les envois et réceptions de ceux-ci et les time-out.
 \section{Structure de l'implémentation}
 
 L'implémentation de Go-Back-N se présente comme l'attache de \bfseries GbnApplication \mdseries aux Host du Network, ce qui leurs permettra de communiquer entre eux. \\
